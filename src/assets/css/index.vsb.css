@@ -1,0 +1,47 @@
+.row-a1 .dyzss {
+    width: 41%;
+}
+
+@media screen and (max-width: 1440px) {
+    .row-a1 .dyzss {
+        width: 49%;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .row-a1 .dyzss {
+        width: 42%;
+    }
+}
+
+@media screen and (max-width: 960px) {
+    .row-a1 .dyzss {
+        width: 100%;
+    }
+}
+
+.dyzs li {
+    border-bottom: 1px dashed #bbb;
+    padding: 1.2% 0;
+}
+
+/*
+.dyzs li a{
+height:66px; line-height:33px; overflow: hidden;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        
+        white-space:unset;
+
+}
+*/
+.dyzs li p {
+    line-height: 30px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #666;
+}
