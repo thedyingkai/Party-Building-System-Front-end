@@ -1,4 +1,4 @@
-# 党建系统前端项目
+# Party-Building-System-Front-end
 
 > 智慧党建信息管理系统 - Vue 2 前端应用
 
@@ -869,3 +869,29 @@ data() {
 - **变量名**：小驼峰（camelCase）- `userName`, `articleList`
 - **常量名**：全大写+下划线 - `API_BASE_URL`, `MAX_FILE_SIZE`
 - **方法名**：小驼峰 - `getUserInfo()`, `handleClick()`
+
+Vue配置（脚手架自动生成文档，如果npm下载较慢请自行换源）
+
+Project setup
+
+```
+npm install
+```
+
+Compiles and hot-reloads for development
+
+```
+npm run serve
+```
+
+Compiles and minifies for production
+
+```
+npm run build
+```
+
+Lints and fixes files
+
+```
+npm run lint
+```
