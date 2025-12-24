@@ -1,14 +1,26 @@
+<!--
+  导航菜单项组件
+  
+  @component NavMenuItem
+  @description 递归菜单项组件，支持多级下拉菜单，鼠标悬停显示子菜单
+  @author 党建系统开发团队
+-->
 <template>
   <div class="nav-menu-item" @mouseenter="showSubMenu = true" @mouseleave="handleMouseLeave">
+    <!-- 菜单项标题 -->
     <div class="nav-menu-item-title">
+      <!-- 无子菜单：直接跳转到文章详情页 -->
       <router-link v-if="!item.child || item.child.length === 0" :to="{ name: 'ArticleShow', params: { id: item.id } }">
         {{ item.name }}
-      </router-link><!-- 当 item.child.length 不为 0 时，只显示名字，不进行跳转 -->
+      </router-link>
+      <!-- 有子菜单：只显示名称，不跳转 -->
       <span v-else>{{ item.name }}</span>
     </div>
+    <!-- 子菜单区域（鼠标悬停显示） -->
     <div v-if="showSubMenu && item.child && item.child.length" class="nav-submenu" @mouseenter="preventSubMenuHide"
-         @mouseleave="handleSubMenuLeave"> <!-- 有子栏目，则递归调用自身 -->
+         @mouseleave="handleSubMenuLeave">
       <ul :class="{ rightSubmenu: level >= 2 }">
+        <!-- 递归渲染子菜单项 -->
         <li v-for="childItem in item.child" :key="childItem.id">
           <NavMenuItem :item="childItem" :level="level + 1" :showSubMenuParent="showSubMenu"/>
         </li>
@@ -21,14 +33,26 @@
 export default {
   name: 'NavMenuItem',
   props: {
+    /**
+     * 菜单项数据
+     * @type {Object}
+     */
     item: {
       type: Object,
       required: true
     },
+    /**
+     * 菜单层级（0为根层级）
+     * @type {Number}
+     */
     level: {
       type: Number,
       default: 0
     },
+    /**
+     * 父级菜单是否显示子菜单
+     * @type {Boolean}
+     */
     showSubMenuParent: {
       type: Boolean,
       default: false
@@ -36,26 +60,41 @@ export default {
   },
   data() {
     return {
-      showSubMenu: false
+      showSubMenu: false  // 当前菜单项是否显示子菜单
     };
   },
   methods: {
+    /**
+     * 鼠标离开菜单项处理
+     * 增加延迟判断，避免鼠标移入子菜单时关闭
+     */
     handleMouseLeave() {
-// 增加一个短暂的延迟，用于判断鼠标是否进入了子菜单区域
       setTimeout(() => {
         if (!this.$el.querySelector('.nav-submenu:hover')) {
           this.showSubMenu = false;
         }
-      }, 200);
+      }, 200);  // 200ms 延迟
     },
+    
+    /**
+     * 阻止子菜单隐藏
+     * 鼠标进入子菜单区域时保持显示
+     */
     preventSubMenuHide() {
       this.showSubMenu = true;
     },
+    
+    /**
+     * 子菜单鼠标离开处理
+     */
     handleSubMenuLeave() {
       this.showSubMenu = false;
     }
   },
   watch: {
+    /**
+     * 监听父组件传入的显示状态
+     */
     showSubMenuParent(newVal) {
       this.showSubMenu = newVal;
     }

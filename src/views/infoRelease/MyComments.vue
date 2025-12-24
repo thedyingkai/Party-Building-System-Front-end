@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component MyComments
+ * @description 我的评论页面 - 展示用户发表的所有评论及审核状态
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 我的评论列表容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-table :data="returntable.filter(data =>!search || (data.title?.toLowerCase()?.includes(search.toLowerCase()))
                                                        || (data.content?.toLowerCase()?.includes(search.toLowerCase())))"
@@ -75,21 +83,40 @@ export default {
   name: "DraftList",
   data() {
     return {
+      /** 当前登录用户信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 我的评论列表数据 */
       tableData: [],
+      /** 搜索关键字 */
       search: '',
+      /** 加载状态 */
       loading: true,
-      currentPage: 1, // 当前页码
-      total: 0, // 总数据量
+      /** 当前页码 */
+      currentPage: 1,
+      /** 总记录数 */
+      total: 0,
+      /** 文章列表（备用） */
       articles: [],
+      /** 每页显示数量 */
       pageSize: 5,
+      /** 文章标题（备用） */
       title: '',
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载后加载评论列表
+   */
   mounted() {
     this.fetchData();
   },
   methods: {
+    /**
+     * 格式化审核状态
+     * @param {Object} row - 行数据
+     * @param {*} column - 列数据
+     * @param {number} cellValue - 状态值
+     * @returns {string} 状态文本
+     */
     formatStatus(row, column, cellValue) {
       switch (cellValue) {
         case 0:
@@ -106,11 +133,21 @@ export default {
           return '未知状态';
       }
     },
+    /**
+     * 移除HTML标签
+     * @param {string} html - HTML内容
+     * @returns {string} 纯文本
+     */
     stripHtmlTags(html) {
       let tmp = document.createElement("DIV");
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText;
     },
+    /**
+     * 编辑记录
+     * @param {number} index - 索引
+     * @param {Object} row - 数据
+     */
     handleEdit(index, row) {
       this.$router.push({
         name: '评论列表',
@@ -123,6 +160,11 @@ export default {
         }
       });
     },
+    /**
+     * 删除评论
+     * @param {number} index - 索引
+     * @param {Object} row - 数据
+     */
     handleDelete(index, row) {
       console.log(index, row);
       let id=row.id;
@@ -134,6 +176,11 @@ export default {
           }
       )
     },
+    /**
+     * 获取第一张图片
+     * @param {string} htmlContent - HTML内容
+     * @returns {string|null} 图片URL
+     */
     getFirstImage(htmlContent) {
       if (htmlContent) {
         let tmp = document.createElement("DIV");
@@ -145,7 +192,11 @@ export default {
       }
       return null;
     },
-    // 新增的计算图片等比例缩放后宽度的计算属性
+    /**
+     * 获取图片宽度
+     * @param {string} htmlContent - HTML内容
+     * @returns {Promise|string} 图片宽度
+     */
     getImageWidth(htmlContent) {
       const img = this.getFirstImage(htmlContent);
       if (img) {
@@ -163,14 +214,34 @@ export default {
       }
       return '0px';
     },
+    /**
+     * 标签过滤方法
+     * @param {string} value - 过滤值
+     * @param {Object} row - 行数据
+     * @returns {boolean} 是否匹配
+     */
+    filterTag(value, row) {
+      return row.status === parseInt(value);
+    },
+    /**
+     * 处理每页条数变化
+     * @param {number} newSize - 新的每页条数
+     */
     handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
+    /**
+     * 处理页码变化
+     * @param {number} newPage - 新的页码
+     */
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
       this.fetchData();
     },
+    /**
+     * 加载评论列表
+     */
     fetchData() {
       this.loading = true; // 先将loading设置为true，表示正在加载数据
       let uid = this.user.uid;
@@ -190,6 +261,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * 返回当前页的评论数据
+     * @returns {Array} 分页后的评论列表
+     */
     returntable() {
       return this.tableData.slice(this.pageSize * (this.currentPage - 1), this.pageSize * this.currentPage);
     }

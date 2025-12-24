@@ -1,6 +1,8 @@
 /*!****** lib.css *******/
 /*!-----------------[初始化]--------------*/
-*, :after, :before {
+*,
+:after,
+:before {
     margin: 0;
     padding: 0;
     -webkit-box-sizing: border-box;
@@ -18,11 +20,13 @@ table {
     border-spacing: 0
 }
 
-ol, ul {
+ol,
+ul {
     list-style: none
 }
 
-q:after, q:before {
+q:after,
+q:before {
     content: ''
 }
 
@@ -36,7 +40,10 @@ h2 {
     font-weight: bold;
 }
 
-abbr, acronym, fieldset, img {
+abbr,
+acronym,
+fieldset,
+img {
     border: 0
 }
 
@@ -49,11 +56,17 @@ abbr, acronym, fieldset, img {
     height: 0
 }
 
-.col-c, .col-l, .col_c, .col_l, .l {
+.col-c,
+.col-l,
+.col_c,
+.col_l,
+.l {
     float: left
 }
 
-.col-r, .col_r, .r {
+.col-r,
+.col_r,
+.r {
     float: right
 }
 
@@ -62,10 +75,11 @@ abbr, acronym, fieldset, img {
 }
 
 .fix {
-    *zoom: 1
+    zoom: 1
 }
 
-.fix:after, .fix:before {
+.fix:after,
+.fix:before {
     display: block;
     content: "clear";
     height: 0;
@@ -91,7 +105,9 @@ img {
     border: none
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     font-size: 14px;
     color: #333;
     border: none;
@@ -101,7 +117,9 @@ input, select, textarea {
     border-radius: 0
 }
 
-input[type=button], input[type=reset], input[type=submit] {
+input[type=button],
+input[type=reset],
+input[type=submit] {
     cursor: pointer
 }
 
@@ -141,7 +159,8 @@ a {
 /*!******************************
     -------[=头部]-------
 ********************************/
-.header, .headerUe {
+.header,
+.headerUe {
     height: 80px;
     background: url(../img/j2.jpg) center no-repeat;
     -o-background-size: cover;
@@ -153,7 +172,8 @@ a {
     margin-top: -1px;
 }
 
-.header.fixed, .headerUe {
+.header.fixed,
+.headerUe {
     position: fixed;
     top: 0;
     left: 0;
@@ -179,11 +199,16 @@ a {
 }
 
 .nav {
-    display: flex; /* 使用Flexbox布局 */
-    justify-content: space-between; /* 使列表项在容器中两端对齐 */
-    list-style: none; /* 移除默认的列表样式 */
-    padding: 0; /* 移除内边距 */
-    margin: 0; /* 移除外边距 */
+    display: flex;
+    /* 使用Flexbox布局 */
+    justify-content: space-between;
+    /* 使列表项在容器中两端对齐 */
+    list-style: none;
+    /* 移除默认的列表样式 */
+    padding: 0;
+    /* 移除内边距 */
+    margin: 0;
+    /* 移除外边距 */
 }
 
 .nav li {
@@ -348,7 +373,8 @@ a {
     color: #fff
 }
 
-.f-copy, .f-info {
+.f-copy,
+.f-info {
     opacity: .8
 }
 
@@ -390,12 +416,16 @@ a {
     color: #7a7a7a
 }
 
-.pages ul a:hover, .pages ul li.on a {
+.pages ul a:hover,
+.pages ul li.on a {
     background-color: #c00001;
     color: #fff
 }
 
-.pages .first, .pages .last, .pages .next, .pages .prev {
+.pages .first,
+.pages .last,
+.pages .next,
+.pages .prev {
     background-repeat: no-repeat;
     background-position: center;
     -o-background-size: 9px;
@@ -404,7 +434,8 @@ a {
     width: 21px
 }
 
-.pages .next, .pages .prev {
+.pages .next,
+.pages .prev {
     -o-background-size: 6px;
     background-size: 6px
 }
@@ -425,7 +456,10 @@ a {
     background-image: url(../img/p6.png)
 }
 
-.pages ul .first a:hover, .pages ul .last a:hover, .pages ul .next a:hover, .pages ul .prev a:hover {
+.pages ul .first a:hover,
+.pages ul .last a:hover,
+.pages ul .next a:hover,
+.pages ul .prev a:hover {
     background-color: #fff;
     opacity: .7
 }
@@ -437,7 +471,9 @@ a {
 }
 
 @media screen and (max-width: 1400px) {
-    .header, .headerbox {
+
+    .header,
+    .headerbox {
         height: 60px
     }
 
@@ -448,7 +484,9 @@ a {
 }
 
 @media screen and (max-width: 1199px) {
-    .wp, .wp1 {
+
+    .wp,
+    .wp1 {
         width: auto;
         padding: 0 15px;
         overflow: hidden;
@@ -464,7 +502,8 @@ a {
         height: 50px
     }
 
-    .headerUe, .menuBtn {
+    .headerUe,
+    .menuBtn {
         display: block
     }
 
@@ -560,7 +599,10 @@ a {
         display: none
     }
 
-    .pages .first, .pages .last, .pages .next, .pages .prev {
+    .pages .first,
+    .pages .last,
+    .pages .next,
+    .pages .prev {
         display: block
     }
 }
@@ -707,8 +749,8 @@ a {
 
 .ul-imgsb1 .txt {
     padding: 18px 20px 17px;
-    colobackground-color: #e9e9e9;
-    r: #312e2e;
+    background-color: #e9e9e9;
+    color: #312e2e;
     -webkit-transition: .4s;
     -o-transition: .4s;
     -moz-transition: .4s;
@@ -780,7 +822,8 @@ a {
     padding-top: 7px
 }
 
-.m-banb1, .m-banb1 .item {
+.m-banb1,
+.m-banb1 .item {
     position: relative
 }
 
@@ -954,7 +997,9 @@ a {
     margin: 37px 0 33px
 }
 
-.m-titb1 i, .m-titb1 img, .m-titb1 span {
+.m-titb1 i,
+.m-titb1 img,
+.m-titb1 span {
     display: inline-block;
     vertical-align: middle
 }
@@ -1145,7 +1190,7 @@ a {
     margin: 0 -11px
 }
 
-.ul-listb4 > li {
+.ul-listb4>li {
     float: left;
     width: 33.33%
 }
@@ -1431,7 +1476,8 @@ a {
         line-height: 1.5
     }
 
-    .m-banb2 .tit .dib, .ul-listb4 .tit {
+    .m-banb2 .tit .dib,
+    .ul-listb4 .tit {
         font-size: 20px
     }
 
@@ -1454,7 +1500,10 @@ a {
         padding-left: 12px
     }
 
-    .g-listb1 h3 a, .m-banb1 .txt, .ul-listb2 .link, .ul-listb4 .name {
+    .g-listb1 h3 a,
+    .m-banb1 .txt,
+    .ul-listb2 .link,
+    .ul-listb4 .name {
         font-size: 14px
     }
 
@@ -1527,7 +1576,10 @@ a {
         padding: 2vw 0
     }
 
-    .m-links .l, .row-a1 .col_l, .row-a2 .col_l, .row-a4 .col_l {
+    .m-links .l,
+    .row-a1 .col_l,
+    .row-a2 .col_l,
+    .row-a4 .col_l {
         float: none;
         width: auto;
         margin-right: 0
@@ -1554,7 +1606,8 @@ a {
         height: 28vw
     }
 
-    .row-a2, .row-a7 {
+    .row-a2,
+    .row-a7 {
         padding-bottom: 3vw
     }
 
@@ -1677,15 +1730,17 @@ a {
         line-height: 45px
     }
 
-    .m-banb2 .tit .dib, .ul-listb4 .tit {
+    .m-banb2 .tit .dib,
+    .ul-listb4 .tit {
         font-size: 18px
     }
 
-    .ul-listb4, .ul-listb4 .conbox {
+    .ul-listb4,
+    .ul-listb4 .conbox {
         margin: 0
     }
 
-    .ul-listb4 > li {
+    .ul-listb4>li {
         float: none;
         width: auto;
         margin-bottom: 10px
@@ -1707,7 +1762,8 @@ a {
         line-height: 30px
     }
 
-    .m-banb1 .txt, .slider-num {
+    .m-banb1 .txt,
+    .slider-num {
         line-height: 74px
     }
 
@@ -1783,9 +1839,6 @@ a {
 
 /************************************************************/
 
-.in-notice-list {
-}
-
 .in-notice-list li {
     padding: 0 3%;
     width: 33.3%;
@@ -1807,6 +1860,7 @@ a {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
 }
 
@@ -1925,13 +1979,13 @@ a {
     background-size: 26px auto;
 }
 
-.yw-tit ul li:first-child + li {
+.yw-tit ul li:first-child+li {
     background: url(../img/huodong.png) no-repeat;
     background-position: left center;
     background-size: 26px auto;
 }
 
-.yw-tit ul li:first-child + li.on {
+.yw-tit ul li:first-child+li.on {
     background: url(../img/huodong.png) no-repeat;
     background-position: left center;
     background-size: 26px auto;
@@ -1952,11 +2006,11 @@ a {
     bottom: -2px;
 }
 
-.yw-cont > ul {
+.yw-cont>ul {
     display: none;
 }
 
-.yw-cont > ul:first-child {
+.yw-cont>ul:first-child {
     display: block;
 }
 
@@ -1967,7 +2021,11 @@ a {
         padding-left: 30px;
     }
 
-    .yw-tit ul li:first-child.on, .yw-tit ul li:first-child, .yw-tit ul li:first-child + li, .yw-tit ul li:first-child + li.on, .yw-tit ul li:first-child + li {
+    .yw-tit ul li:first-child.on,
+    .yw-tit ul li:first-child,
+    .yw-tit ul li:first-child+li,
+    .yw-tit ul li:first-child+li.on,
+    .yw-tit ul li:first-child+li {
         background-size: 20px auto;
     }
 
@@ -1993,5 +2051,3 @@ a {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
-                   

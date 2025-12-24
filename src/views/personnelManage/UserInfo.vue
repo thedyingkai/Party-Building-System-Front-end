@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component UserInfo
+ * @description 用户个人信息页面 - 展示用户基本信息、支部统计、积分记录等
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 用户信息容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh;background-color: rgb(238, 241, 246);
   align-items: center;justify-content: center">
     <div class="container"
@@ -161,18 +169,32 @@ export default {
   components: {SingleImageUploader},
   data() {
     return {
+      /** 当前登录用户信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 修改头像对话框显示状态 */
       dialogVisible_editAvatar: false,
+      /** 修改账号对话框显示状态 */
       dialogVisible_editAccount: false,
+      /** 账号信息表单对象 */
       account: {uname: '', psw: ''},
+      /** 文章日期范围筛选 */
       dateRange: [],
-      allArticles: [],    // 存储所有文章数据
-      filteredCount: 0,// 新增文章统计字段
-      branchStats: [], // 初始化为空数组
+      /** 存储所有文章数据 */
+      allArticles: [],
+      /** 筛选后的文章数量 */
+      filteredCount: 0,
+      /** 支部文章统计数据 */
+      branchStats: [],
+      /** 所有支部文章数据 */
       allBranchArticles: []
     }
   },
   computed: {
+    /**
+     * 排序后的支部统计数据
+     * 合并文章数据和统计数据，返回4个支部的统计信息
+     * @returns {Array} 包含支部ID、名称和文章数量的数组
+     */
     sortedBranches() {
       // 从所有文章中提取唯一支部信息
         // 修复1：使用新的数据源allBranchArticles
@@ -225,10 +247,19 @@ export default {
     this.loadBranchStats();
   },
   methods: {
+    /**
+     * 安全地将值转换为整数支部ID
+     * @param {*} value - 需要转换的值
+     * @returns {number} 转换后的整数ID，无效值返回0
+     */
     safeParseBid(value) {
       const bid = Number(value)
       return Number.isInteger(bid) ? bid : 0
     },
+    /**
+     * 加载支部文章统计数据
+     * 从服务器获取所有支部的文章数据并进行统计
+     */
     loadBranchStats() {
       this.$request.get('/article/selectArticleBybranch')
           .then(res => {
@@ -254,6 +285,11 @@ export default {
             }
           })
     },
+    /**
+     * 根据支部ID获取支部名称
+     * @param {number|string} bid - 支部ID
+     * @returns {string} 支部名称，无效ID返回'未配置'
+     */
     getBranchName(bid) {
       const validBid = this.safeParseBid(bid)
       if (validBid <= 0) return '未配置'
@@ -263,6 +299,10 @@ export default {
       )
       return article?.name || `支部${validBid}`
     },
+    /**
+     * 根据日期范围筛选文章
+     * 根据用户选择的日期范围更新文章统计数量
+     */
     filterArticles() {
       if (!this.dateRange || this.dateRange.length !== 2) {
         this.filteredCount = this.allArticles.length;
@@ -279,6 +319,10 @@ export default {
       }).length;
     },
 
+    /**
+     * 加载当前用户的所有文章数据
+     * 从服务器获取用户发布的文章并更新统计信息
+     */
     loadArticles() {
       this.$request.get(`/article/selectArticleByuid/${this.user.uid}`)
           .then(res => {
@@ -294,19 +338,33 @@ export default {
           });
     },
 
-    // 更新用户数据中的统计字段
+    /**
+     * 更新用户文章统计数量
+     * 将文章总数保存到用户数据和本地存储
+     */
     updateUserArticleCount() {
       this.user.articleCount = this.allArticles.length;
       localStorage.setItem("current-user", JSON.stringify(this.user));
     },
 
+    /**
+     * 打开编辑头像对话框
+     */
     editAvatar() {
       this.dialogVisible_editAvatar = true;
     },
+    /**
+     * 打开编辑账号信息对话框
+     * 初始化账号表单数据
+     */
     editAccount() {
       this.account = {uname: this.user.uname, psw: this.user.psw}
       this.dialogVisible_editAccount = true;
     },
+    /**
+     * 编辑用户显示名称
+     * 弹出输入框让用户修改显示名称（仅支持中文）
+     */
     editUsername() {
       this.$prompt('请输入新名称', '提示', {
         confirmButtonText: '确定',
@@ -335,10 +393,17 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 关闭所有对话框
+     */
     handleClose() {
       this.dialogVisible_editAvatar = false;
       this.dialogVisible_editAccount = false;
     },
+    /**
+     * 更新用户头像
+     * @param {string} avatar - 新头像的URL地址
+     */
     updateAvatar(avatar) {
       const user1 = {
         id: this.user.uid,
@@ -357,6 +422,10 @@ export default {
         console.error('数据加载出现错误:', error);
       });
     },
+    /**
+     * 更新用户账号信息
+     * 提交修改后的用户名和密码，需要重新登录
+     */
     updateAccount() {
       this.account.id = this.user.uid
       this.$request.put('user/updateAccount', this.account).then(

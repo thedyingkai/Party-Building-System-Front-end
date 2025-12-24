@@ -1,18 +1,37 @@
 <!DOCTYPE html>
+<!--
+  应用主入口 HTML 文件
+  
+  @description 这是 Vue 应用的主 HTML 模板，Vue CLI 会在构建时自动注入编译后的资源
+  @note 所有的 JavaScript 和 CSS 文件都会在构建时自动插入到这个文件中
+-->
 <html lang="">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<!--      <link rel="icon" href="<%= BASE_URL %>favicon.ico">-->
-      <link rel="icon" href="<%= BASE_URL %>校标.png">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+
+<head>
+  <!-- 字符编码设置为 UTF-8 -->
+  <meta charset="utf-8">
+  <!-- 使用 IE 最新渲染引擎 -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- 移动端视口配置，确保响应式设计 -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <!-- 网站图标配置 -->
+  <!--      <link rel="icon" href="<%= BASE_URL %>favicon.ico">-->
+  <link rel="icon" href="<%= BASE_URL %>校标.png">
+  <!-- 动态设置页面标题 -->
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+</head>
+
+<body>
+  <!-- 不支持 JavaScript 时显示的提示信息 -->
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong>
+  </noscript>
+  <!-- Vue 应用的挂载点 -->
+  <div id="app"></div>
+  <!-- 构建后的文件将自动注入到这里 -->
+</body>
+
 </html>

@@ -1,5 +1,13 @@
+<!--
+  资源上传器组件
+  
+  @component ResourceUploader
+  @description 拖拽上传组件，支持多文件上传、预览和描述添加
+  @author 党建系统开发团队
+-->
 <template>
   <div style="display: flex;flex-direction: column">
+    <!-- 上传区域 -->
     <el-upload ref="uploadRef" v-model="files" :auto-upload="false" :file-list="files"
                :http-request="uploadSubmit" :limit="limit" :multiple="limit>1" :on-change="handleChange"
                :on-exceed="handleExceed" :show-file-list="false"  :action="uploadAction"
@@ -11,7 +19,9 @@
         </div>
       </template>
     </el-upload>
+    <!-- 上传按钮 -->
     <el-button size="small" type="success" @click="handleUpload">上传</el-button>
+    <!-- 文件预览列表 -->
     <ul class="viewBox">
       <li v-for="(file, index) in files" :key="index">
         <div class="image-card">
@@ -25,13 +35,14 @@
             <div class="filename">{{ file.name }}</div>
           </el-tooltip>
         </div>
+        <!-- 文件描述输入 -->
         <div class="description-input">
-          <!-- 绑定 v-model 到文件对象的 description 属性 -->
           <el-input v-model="file.description" :rows="4" class="description-input-inner" placeholder="添加文件描述"
                     resize="none" type="textarea"></el-input>
         </div>
       </li>
     </ul>
+    <!-- 图片查看器 -->
     <el-image-viewer v-if="showImageView" :on-close="closeViewer" :url-list="urls"
                      style="z-index: 99999;"></el-image-viewer>
   </div>
@@ -46,29 +57,52 @@ export default {
     ElImageViewer,
   },
   props: {
+    /**
+     * 最大上传数量
+     * @type {Number}
+     */
     limit: {
       type: Number,
       default: 9,
     },
+    /**
+     * 活动ID
+     * @type {Number}
+     */
     acid: {
       type: Number,
     }
   },
   data() {
     return {
+      // 文件列表
       files: [],
+      // 图片URL列表（用于查看器）
       urls: [],
+      // 当前用户
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      // 是否为用户选择操作
       isUserSelecting: false,
+      // 是否显示图片查看器
       showImageView: false,
     };
   },
   computed: {
+    /**
+     * 上传接口地址
+     * @returns {string} 完整的上传API URL
+     */
     uploadAction() {
       return `${process.env.VUE_APP_BASEURL}/file/upload`;
     },
   },
   methods: {
+    /**
+     * 执行文件上传
+     * @param {Object} options - 上传选项对象
+     * @param {File} options.file - 要上传的文件
+     * @description 将文件上传到服务器并保存资源信息
+     */
     async uploadSubmit(options) {
       const formData = new FormData();
       formData.append('file', options['file']);
@@ -131,6 +165,12 @@ export default {
       }
       this.isUserSelecting = false;
     },
+    /**
+     * 处理文件变化
+     * @param {Object} uploadFile - 当前上传的文件
+     * @param {Array} uploadFiles - 所有上传的文件列表
+     * @description 当用户选择文件后，创建预览URL
+     */
     handleChange(uploadFile, uploadFiles) {
       if (this.isUserSelecting) {
         uploadFiles.forEach(item => {
@@ -140,9 +180,19 @@ export default {
         this.files = uploadFiles;
       }
     },
+    /**
+     * 执行上传
+     * @description 手动触发文件上传
+     */
     handleUpload() {
       this.$refs.uploadRef.submit();
     },
+    /**
+     * 处理文件超出限制
+     * @param {Array} files - 新选择的文件
+     * @param {Array} uploadfiles - 已上传的文件列表
+     * @description 当上传文件数量超过限制时的处理
+     */
     handleExceed(files, uploadfiles) {
       if (this.limit === 1) {
         this.$refs.uploadRef.clearFiles();
@@ -152,15 +202,28 @@ export default {
             + uploadfiles.length + '张，本次还可以上传' + (this.limit - uploadfiles.length) + '张');
       }
     },
+    /**
+     * 移除文件
+     * @param {number} index - 文件索引
+     * @description 从文件列表中移除指定文件
+     */
     remove(index) {
       this.files.splice(index, 1);
     },
+    /**
+     * 查看图片
+     * @description 打开图片查看器
+     */
     imageView() {
       this.showImageView = true;
       this.urls = this.files.map(file => {
         return file.url;
       });
     },
+    /**
+     * 关闭查看器
+     * @description 关闭图片查看器
+     */
     closeViewer() {
       this.showImageView = false;
     },

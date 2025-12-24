@@ -1,5 +1,13 @@
+<!--
+  问题项组件
+  
+  @component QuestionItem
+  @description 显示用户提问内容的组件
+  @author 党建系统开发团队
+-->
 <template>
   <div class="question-warp">
+    <!-- 问题内容 -->
     <div class="question-content">
       {{ value }}
     </div>
@@ -9,6 +17,10 @@
 export default {
   name: 'QuestionItem',
   props: {
+    /**
+     * 问题文本内容
+     * @type {String}
+     */
     value: String,
   },
   data() {

@@ -1,9 +1,18 @@
+<!--
+  文章列表组件
+  
+  @component ArticleList
+  @description 展示文章列表，支持分页显示、自定义样式和可选日期显示
+  @author 党建系统开发团队
+-->
 <template>
   <div>
+    <!-- 文章列表表格 -->
     <el-table
         :data="returnArticles" :show-header="false" :class="tableType"
         style="width:100%;" :cell-style="{ textAlign: 'left'}"
         :row-style="{ height: '20px' }">
+      <!-- 文章标题列 -->
       <el-table-column
           prop="title"
           label=""
@@ -15,11 +24,13 @@
           }"
       >
         <template slot-scope="scope">
+          <!-- 文章标题链接 -->
           <router-link :to="getArticleUrl(scope.row)">
             <span class="text-overflow-box"> {{ scope.row.title }}</span>
           </router-link>
         </template>
       </el-table-column>
+      <!-- 发布时间列（可选显示） -->
       <el-table-column
           prop="publish_time"
           label=""
@@ -36,22 +47,30 @@
 export default {
   name: 'ArticleList',
   props: {
-    articles: {type: Array, required: true},
-    pageSize: {type: Number, default: 5},
-    title: {type: String, required: false},
-    currentPage: {type: Number, default: 1, required: true},
-    columnClass1: {type: String, required: false},
-    columnClass2: {type: String, required: false},
-    showDate: {type: Boolean, default: true, required: true,},
-    tableType: {type: String, required: true},
+    articles: {type: Array, required: true},              // 文章数据数组
+    pageSize: {type: Number, default: 5},                 // 每页显示数量
+    title: {type: String, required: false},               // 列表标题（可选）
+    currentPage: {type: Number, default: 1, required: true}, // 当前页码
+    columnClass1: {type: String, required: false},        // 第一列样式类
+    columnClass2: {type: String, required: false},        // 第二列样式类
+    showDate: {type: Boolean, default: true, required: true,}, // 是否显示日期
+    tableType: {type: String, required: true},            // 表格类型样式
   },
   methods: {
+    /**
+     * 获取文章详情页 URL
+     * @param {Object} article - 文章对象
+     * @returns {string} 文章详情页路径
+     */
     getArticleUrl(article) {
-      // 假设每个文章都有一个唯一的ID，可以用于构建URL
       return `/article/${article.id}`;
     }
   },
   computed: {
+    /**
+     * 返回当前页的文章列表
+     * @returns {Array} 当前页文章数组
+     */
     returnArticles() {
       return this.articles.slice(this.pageSize * (this.currentPage - 1), this.pageSize * this.currentPage);
     }

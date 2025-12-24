@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component CarouselSet
+ * @description 轮播图设置页面 - 支持轮播图的增删改、拖拽排序、链接配置
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 轮播图编辑器容器 -->
   <div class="carousel-editor-container">
     <div class="action-buttons" style="margin-bottom: 20px">
       <button @click="saveCarousel" class="primary-btn">保存</button>
@@ -124,14 +132,26 @@ export default {
   },
 
   methods: {
+    /**
+     * 显示图片上传对话框
+     * @param {number} index - 图片索引
+     */
     showDialog(index) {
       this.dialogVisible = true;
       this.chosenPic=index;
     },
+    /**
+     * 更新图片URL
+     * @param {string} url - 新图片的URL
+     */
     updatePic(url) {
       this.carouselImages[this.chosenPic].url=url;
     },
 
+    /**
+     * 获取轮播图数据
+     * 从服务器加载轮播图配置
+     */
     fetchCarouselData() {
       this.$request.get('/homePic/all').
       then(res => {
@@ -139,7 +159,10 @@ export default {
       });
     },
 
-    // 保存轮播图配置
+    /**
+     * 保存轮播图配置
+     * 验证数据并保存到服务器
+     */
     saveCarousel() {
       // 数据验证
       const invalidImages = this.carouselImages.some(img => !img.url);
@@ -161,25 +184,36 @@ export default {
       console.log('保存的数据:', this.carouselImages);
     },
 
-    // 取消编辑
+    /**
+     * 取消编辑
+     * 返回上一页
+     */
     cancelEdit() {
       this.$router.go(-1);
     },
 
-    // 增加图片数量
+    /**
+     * 增加图片数量
+     */
     increaseQuantity() {
       const newId = this.carouselImages.length + 1;
       this.carouselImages.push({ id: newId, url: '', link: '' ,text:''});
     },
 
-    // 减少图片数量
+    /**
+     * 减少图片数量
+     */
     decreaseQuantity() {
       if (this.carouselImages.length > 1) {
         this.carouselImages.splice(this.carouselImages.length - 1, 1);
       }
     },
 
-    // 处理图片上传
+    /**
+     * 处理图片上传
+     * @param {Event} event - 文件上传事件
+     * @param {number} index - 图片索引
+     */
     handleImageUpload(event, index) {
       const file = event.target.files[0];
       if (file) {
@@ -191,7 +225,10 @@ export default {
       }
     },
 
-    // 删除图片
+    /**
+     * 删除图片
+     * @param {number} index - 图片索引
+     */
     deleteImage(index) {
       if (this.carouselImages.length > 1) {
         this.carouselImages.splice(index, 1);
@@ -203,7 +240,11 @@ export default {
       }
     },
 
-    // 拖动排序开始
+    /**
+     * 处理拖动开始事件
+     * @param {number} index - 被拖动图片的索引
+     * @param {Event} event - 拖动事件
+     */
     handleDragStart(index, event) {
       this.dragIndex = index;
       this.isDragging = true;
@@ -219,6 +260,10 @@ export default {
       event.dataTransfer.setData('text/plain', index);
     },
 
+    /**
+     * 处理拖动经过事件
+     * @param {Event} event - 拖动事件
+     */
     handleDragOver(event) {
       event.preventDefault();
       const targetItem = event.target.closest('.image-item');
@@ -235,6 +280,10 @@ export default {
       }
     },
 
+    /**
+     * 处理拖动结束事件
+     * @param {Event} event - 拖动事件
+     */
     handleDragEnd(event) {
       this.isDragging = false;
       if (this.draggedElement) {

@@ -1,11 +1,20 @@
+<!--
+  AI 回答项组件
+  
+  @component AnswerItem
+  @description 显示 AI 回答内容，支持思考过程折叠展示和 Markdown 渲染
+  @author 党建系统开发团队
+-->
 <template>
   <div class="answer-warp">
     <div class="answer-content">
+      <!-- 思考过程折叠面板 -->
       <el-collapse v-show="thinkContent && thinkContent.trim()!== ''" v-model="expandedNames">
         <el-collapse-item name="think-process" title="思考过程">
           <div v-html="thinkContent"></div>
         </el-collapse-item>
       </el-collapse>
+      <!-- 回答内容（Markdown 渲染） -->
       <div class="markdown-body" v-html="nonThinkContent"></div>
     </div>
     <div>
@@ -18,6 +27,10 @@
 export default {
   name: 'AnswerItem',
   props: {
+    /**
+     * AI 回答的原始文本内容（可能包含 <think> 标签）
+     * @type {String}
+     */
     value: String,
   },
   data() {
@@ -55,6 +68,12 @@ export default {
     }
   },
   methods: {
+    /**
+     * 处理内容，分离思考过程和实际回答
+     * 
+     * @param {String} value - 原始内容
+     * @description 从内容中提取 <think></think> 标签内的思考过程
+     */
     processContent(value) {
       const thinkIndex = value.indexOf('<think>');
       const endThinkIndex = value.indexOf('</think>');

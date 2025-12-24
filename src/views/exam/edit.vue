@@ -1,6 +1,13 @@
-
+<!--
+  试题编辑页面
+  
+  @component edit
+  @description 试题管理页面，支持试题的增删改查、批量导入导出和分类筛选
+  @author 党建系统开发团队
+-->
 <template xmlns="http://www.w3.org/1999/html">
   <div>
+    <!-- 操作栏：查询、重置、导入导出、添加 -->
     <div style="margin: 6px 0">
       <div>
         <el-select style="margin-right: 10px;" v-model="value" placeholder="请选择">
@@ -192,6 +199,10 @@ import request from "@/utils/request";
 export default
 {
   name:"edit",
+  /**
+   * @description 组件数据
+   * @returns {Object} 包含表格数据、分页参数、题型选项、关键词列表等
+   */
   data() {
     return {
       tableData:[],        //动态传入页面数据
@@ -239,6 +250,10 @@ export default
   updated() {
   },
   methods: {
+    /**
+     * @description 删除选择题的某个选项
+     * @param {Number} index - 选项索引
+     */
     handleDeleteChoice(index)
     {
       if(index > 0)
@@ -246,6 +261,9 @@ export default
         this.m_choices.splice(index,1)
       }
     },
+    /**
+     * @description 获取所有关键词列表
+     */
     allKeywords()
     {
       request.get('/keywords').then(res =>{
@@ -263,6 +281,10 @@ export default
     },
 
 
+    /**
+     * @description 上传题库文件
+     * @param {String} formId - 表单ID
+     */
     doupload(formId) {
       // 获取表单元素
       const form = document.getElementById(formId);
@@ -291,11 +313,17 @@ export default
 
 
 
+/**
+     * @description 一键导出题库
+     */
 handleexport() {    //一键导出题库
   // 替换为实际的下载链接
 
   window.open( process.env.VUE_APP_BASEURL+'/batch/export');
     },
+    /**
+     * @description 确认添加题目,根据题型执行不同的添加逻辑
+     */
     handleConfirm()
     {
       console.log(this.form)
@@ -417,20 +445,36 @@ handleexport() {    //一键导出题库
       }
 
     },
+    /**
+     * @description 打开添加题目对话框
+     */
     handleAdd()
     {
       this.formVisible = true
 
       this.form = {}
     },
+    /**
+     * @description 批量删除题目(预留方法)
+     */
     handleDeleteBatch()
     {
       console.log(this.choices)
     },
+    /**
+     * @description 编辑题目(预留方法)
+     * @param {Number} index - 行索引
+     * @param {Object} row - 行数据
+     */
     handleEdit(index, row)
     {
       console.log(row)
     },
+    /**
+     * @description 删除题目
+     * @param {Number} index - 行索引
+     * @param {Object} row - 行数据
+     */
     handleDelete(index, row)
     {
       if(row.type === '选择题')
@@ -459,10 +503,17 @@ handleexport() {    //一键导出题库
       }
       this.tableData.splice(index, 1)
     },
+    /**
+     * @description 处理表格选择变化
+     * @param {Array} s - 选中的行数据
+     */
     handleSelectionChange(s)
     {
       this.choices = s
     },
+    /**
+     * @description 执行查询操作
+     */
     handleQuery() {
       if (this.value === '' || this.keyword === '' ) {
         this.tableData = [];
@@ -471,24 +522,44 @@ handleexport() {    //一键导出题库
         this.searchQuestions();
       }
     },
+    /**
+     * @description 加载数据(预留分页查询接口)
+     */
     load() {
 
       //分页查询
     },
+    /**
+     * @description 处理页码变化
+     * @param {Number} pageNum - 新的页码
+     */
     handleCurrentChange(pageNum) {
       this.pageNum = pageNum;
     },
+    /**
+     * @description 对表格数据进行分页切片
+     * @returns {Array} 当前页的数据
+     */
     sliceDate()
     {
       return this.tableData.slice(this.pageSize*(this.pageNum -1 ), this.pageSize*(this.pageNum))
     },
+    /**
+     * @description 清空搜索条件
+     */
     handleClean() {
       this.keyword = '';
       this.value = '';
     },
+    /**
+     * @description 重置数据(预留方法)
+     */
     reset() {//清除重置
 
     },
+    /**
+     * @description 获取所有题目数据(判断题、选择题、填空题)
+     */
     allQuestions() {
       request.get('/questions/tf').then((res) => {
         let questions = res.data;
@@ -567,6 +638,9 @@ handleexport() {    //一键导出题库
         })
       })
     },
+    /**
+     * @description 根据搜索条件搜索题目
+     */
     searchQuestions() {
       this.tableData = [];
       request.get("/questions/tf/search/" + this.value + "/" + this.keyword.toString()).then(res => {

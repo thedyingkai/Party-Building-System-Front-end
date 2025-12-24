@@ -1,6 +1,14 @@
+<!--
+  资源上传组件
+  
+  @component ResourceUpload
+  @description 支持文件上传、浏览、移动和筛选的资源管理组件
+  @author 党建系统开发团队
+-->
 <template>
   <div style="display: flex; flex-direction: column; flex-grow: 1;">
     <el-container>
+      <!-- 头部操作区 -->
       <el-header class="center-box">
         <div>
           <el-button size="middle" type="primary" @click="dialogVisible=true"><i class="el-icon-upload"></i>上传文件
@@ -9,6 +17,7 @@
               class="el-icon-upload"></i>移动
           </el-button>
         </div>
+        <!-- 搜索和筛选 -->
         <div class="center-box">
           <div class="input-container">
             <el-input
@@ -19,10 +28,12 @@
           <drop-down-menu v-show="!isMenu" :menu-items="menuData"></drop-down-menu>
         </div>
       </el-header>
+      <!-- 主内容区 -->
       <el-main>
         <div style="margin: 10px">
           <div v-if="!isMenu" class="click-able" @click="goBack"><i class="el-icon-back">返回</i></div>
         </div>
+        <!-- 活动列表视图 -->
         <el-table v-if="isMenu"
                   :data="filteredTableData"
                   :header-cell-style="{background: '#f5f7fa', color: '#606266' }"
@@ -141,24 +152,43 @@ export default {
   components: {ResourceUploader, DropDownMenu},
   data() {
     return {
+      // 单个文件
       file: '',
+      // 文件列表
       fileList: [],
+      // 单个URL
       url: '',
+      // URL列表
       urls: [],
+      // 当前用户
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      // 上传对话框显示状态
       dialogVisible: false,
+      // 表格数据
       tableData: [],
+      // 多选项
       multipleSelection: [],
+      // 是否为菜单视图
       isMenu: true,
+      // 活动列表
       activities: [],
+      // 目标活动ID
       targetActivityId: -1,
+      // 是否存在选中项
       existSelected: false,
+      // 确认按钮文本
       confirmButtonText: '确定',
+      // 取消按钮文本
       cancelButtonText: '取消',
+      // 移动对话框显示状态
       dialogVisible_move: false,
+      // 自定义对话框类名
       customClass: 'custom-dialog-box',
+      // 当前菜单ID
       currentMenuId: '',
+      // 过滤文本
       filterText: '',
+      // 菜单数据
       menuData: [
         {icon: "el-icon-menu", label: "全部"},
         {icon: "el-icon-picture", label: "图片"},
@@ -171,10 +201,19 @@ export default {
       ],
     };
   },
+  /**
+   * 组件挂载后
+   * @description 加载活动列表
+   */
   mounted() {
     this.showActivities();
   },
   computed: {
+    /**
+     * 过滤后的表格数据
+     * @returns {Array} 过滤后的数据列表
+     * @description 根据过滤文本筛选表格数据
+     */
     filteredTableData() {
       if (this.filterText === '') {
         return this.tableData;
@@ -186,6 +225,14 @@ export default {
     }
   },
   methods: {
+    /**
+     * 渲染树节点内容（对话框中）
+     * @param {Function} h - createElement 函数
+     * @param {Object} context - 节点上下文
+     * @param {Object} context.data - 节点数据
+     * @returns {VNode} 虚拟节点
+     * @description 自定义树节点的渲染内容，显示文件夹或文件图标
+     */
     renderContentInDialog(h, {data}) {
       const children = [];
       children.push(h('span', {class: 'icon'}, [
@@ -195,12 +242,26 @@ export default {
       children.push(h('span', {}, labelText));
       return h('span', {class: 'custom-tree-node'}, children);
     },
+    /**
+     * 选择所有资源
+     * @param {Array} selectedSourceList - 选中的资源列表
+     * @returns {Array} 资源ID数组
+     * @description 提取所有选中资源的ID
+     */
     selectAll(selectedSourceList) {
       let result = [];
-      selectedSourceList.forEach(item => {
-        let id = item.id
-        result.push(id);
-      })
+    /**
+     * 清空选中的资源
+     * @description 关闭移动对话框并清空选中资源列表
+     */
+    clearSelectedSource() {
+      this.selectedSourceList = [];
+      this.dialogVisible_move = false;
+    },
+    /**
+     * 显示活动列表
+     * @description 从服务器获取所有活动数据
+     */})
       return result;
     },
     clearSelectedSource() {
@@ -211,14 +272,34 @@ export default {
       this.$request.get('/activity/selectAll').then(
           res => {
             if (res.code === '200') {
-              this.activities = res.data;
-              this.tableData = this.activities;
-            }
-          }
-      ).catch((error) => {
-        console.error('数据加载出现错误:', error);
-      });
+    /**
+     * 返回到活动列表
+     * @description 切换回菜单视图并刷新活动列表
+     */
+    goBack() {
+      this.isMenu = true;
+      this.showActivities();
     },
+    /**
+     * 打开文件
+     * @param {string} content - 文件URL
+     * @description 在新窗口中打开文件
+     */
+    openFile(content) {
+      // 使用 window.open 打开文件地址
+      window.open(content);
+    },
+    /**
+     * 关闭上传对话框
+     * @description 清空文件并关闭上传对话框
+     */
+    /**
+     * 处理文件上传
+     * @param {Object} response - 服务器响应
+     * @param {Object} file - 文件对象
+     * @param {Array} fileList - 文件列表
+     * @description 处理文件上传后的响应，保存文件信息到数据库
+     */
     goBack() {
       this.isMenu = true;
       this.showActivities();
@@ -265,29 +346,64 @@ export default {
               if (res.code === '200') {
                 this.$message.success('上传成功');
                 this.handleClose()
+    /**
+     * 移动资源到指定活动
+     * @description 将选中的资源批量移动到目标活动
+     */
               }
             }
         ).catch((error) => {
           console.error('数据加载出现错误:', error);
         });
-      } else this.$message.error(response.msg);
-    },
-    moveSourceTo() {
-      const selectedSourceIdList = this.$refs["tree-to-move"].getCheckedKeys();
-      this.$request.put('/resource/batchMoveToActivity/' + this.targetActivityId, selectedSourceIdList).then(
-          res => this.$handleResponse(res, () => {
-            this.$message.success('移动成功');
-            this.getResourceFromMenu(this.currentMenuId);
-          }));
-      this.dialogVisible_move = false;
-    },
+    /**
+     * 提交上传
+     * @description 手动触发文件上传
+     */
     submitUpload() {
       this.$refs.upload.submit();
     },
+    /**
+     * 移除文件
+     * @param {Object} file - 文件对象
+     * @param {Array} fileList - 文件列表
+     * @description 从列表中移除指定文件
+     */
     handleRemove(file, fileList) {
       console.log(file, fileList);
       this.$message.success("文件'" + file.name + "'已移除");
     },
+    /**
+     * 处理文件超出限制
+     * @param {Array} files - 新选择的文件
+     * @param {Array} fileList - 已选择的文件列表
+     * @description 当选择的文件数量超过限制时提示用户
+     */
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 9 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    /**
+     * 处理选择变化
+     * @param {Array} val - 选中的行数据
+     * @description 更新多选状态和选中的资源列表
+     */
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+      if (val.length > 0) {
+        this.existSelected = true;
+      } else {
+        this.existSelected = false;
+      }
+    },
+    /**
+     * 从菜单获取资源
+    /**
+     * 进入活动菜单
+     * @param {number} id - 活动ID
+     * @description 切换到资源列表视图并加载指定活动的资源
+     */
+     * @param {number} id - 活动ID
+     * @description 根据活动ID获取该活动的所有资源
+     */
     handleExceed(files, fileList) {
       this.$message.warning(`当前限制选择 9 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
     },

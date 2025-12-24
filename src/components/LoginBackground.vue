@@ -1,10 +1,19 @@
+<!--
+  登录背景容器组件
+  
+  @component LoginBackground
+  @description 登录和注册页面的背景容器，使用插槽支持自定义头部和主体内容
+  @author 党建系统开发团队
+-->
 <template>
   <el-container class="login_background">
+    <!-- 头部插槽：用于导航栏 -->
     <el-header>
-      <slot name="header"></slot> <!-- 使用插槽来插入登录表单或其他内容 -->
+      <slot name="header"></slot>
     </el-header>
+    <!-- 主体插槽：用于登录/注册表单 -->
     <el-main>
-      <slot></slot> <!-- 使用插槽来插入登录表单或其他内容 -->
+      <slot></slot>
     </el-main>
   </el-container>
 </template>

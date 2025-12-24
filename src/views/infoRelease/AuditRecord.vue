@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component AuditRecord
+ * @description 审核记录页面 - 展示用户审核过的所有文章记录
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 审核记录列表容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-table v-loading="loading"
               :cell-style="{ padding: '0px' }" :data="returntable.filter(data =>!search || (data.title?.toLowerCase()?.includes(search.toLowerCase()))
@@ -86,27 +94,42 @@ export default {
   components: {AuditForm, ArticleView},
   data() {
     return {
+      /** 当前登录用户信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 审核记录列表数据 */
       tableData: [],
+      /** 搜索关键字 */
       search: '',
+      /** 加载状态 */
       loading: true,
+      /** 当前查看的草稿信息 */
       draft: {
         id: '',
         title: '',
         source: '',
         content: '',
       },
+      /** 预览对话框显示状态 */
       dialogVisible: false,
-      currentPage: 1, // 当前页码
-      total: 0, // 总数据量
+      /** 当前页码 */
+      currentPage: 1,
+      /** 总记录数 */
+      total: 0,
+      /** 每页显示数量 */
       pageSize: 5,
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载后加载审核记录和计算分页大小
+   */
   mounted() {
     this.fetchData();
     this.calculatePageSize();
   },
   methods: {
+    /**
+     * 加载审核记录
+     */
     fetchData() {
       this.loading = true; // 先将 loading 设置为 true，表示正在加载数据
       this.$request.get('/audit/selectAuditedByUid/' + this.user.uid).then(
@@ -123,19 +146,37 @@ export default {
         this.loading = false; // 如果请求出现错误，同样将 loading 设置为 false，避免一直处于加载状态
       });
     },
+    /**
+     * 处理每页条数变化
+     * @param {number} newSize - 新的每页条数
+     */
     handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
+    /**
+     * 处理页码变化
+     * @param {number} newPage - 新的页码
+     */
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
       this.fetchData();
     },
+    /**
+     * 移除HTML标签
+     * @param {string} html - HTML内容
+     * @returns {string} 纯文本
+     */
     stripHtmlTags(html) {
       let tmp = document.createElement("DIV");
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText;
     },
+    /**
+     * 查看审核记录详情
+     * @param {number} index - 索引
+     * @param {Object} row - 记录数据
+     */
     check(index, row) {
       this.draft.id = row.id;
       this.draft.title = row.title;
@@ -143,12 +184,26 @@ export default {
       this.draft.content = row.content;
       this.dialogVisible = true;
     },
+    /**
+     * 删除记录
+     * @param {number} index - 索引
+     * @param {Object} row - 数据
+     */
     handleDelete(index, row) {
       console.log(index, row);
     },
+    /**
+     * 处理输入事件
+     * @param {Event} event - 输入事件
+     */
     handleInput(event) {
       console.log(event);
     },
+    /**
+     * 获取第一张图片
+     * @param {string} htmlContent - HTML内容
+     * @returns {string|null} 图片URL
+     */
     getFirstImage(htmlContent) {
       if (htmlContent) {
         let tmp = document.createElement("DIV");
@@ -160,6 +215,11 @@ export default {
       }
       return null;
     },
+    /**
+     * 获取图片宽度
+     * @param {string} htmlContent - HTML内容
+     * @returns {Promise|string} 图片宽度
+     */
     getImageWidth(htmlContent) {
       const img = this.getFirstImage(htmlContent);
       if (img) {
@@ -177,14 +237,26 @@ export default {
       }
       return '0px';
     },
+    /**
+     * 关闭预览对话框
+     */
     cancel() {
       this.dialogVisible = false;
     },
+    /**
+     * 计算每页显示数量
+     * 根据组件高度计算合适的分页大小
+     */
     calculatePageSize() {
       const rowHeight = 50; // 假设 el-table 每行的高度为 50px
       const templateHeight = 300; // 假设减去一些边距，这里是 20px，可根据实际调整
       this.pageSize = Math.floor(templateHeight / rowHeight);
     },
+    /**
+     * 格式化审核记录状态
+     * @param {number} id - 状态值
+     * @returns {string} 状态文本
+     */
     returnRecordStatus(id){
       switch (id) {
         case 0:
@@ -201,6 +273,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * 返回当前页的审核记录
+     * @returns {Array} 分页后的记录列表
+     */
     returntable() {
       return this.tableData.slice(this.pageSize * (this.currentPage - 1), this.pageSize * this.currentPage);
     },

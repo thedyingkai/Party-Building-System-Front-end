@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component Statistics
+ * @description 测评情况统计 - 展示试卷答题统计数据,包括各选项选择人数、填空题详情、答题人数分布
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 统计容器 -->
   <div id="app" class="container">
     <!-- 页面标题 -->
     <div class="header">
@@ -69,6 +77,10 @@ import request from "@/utils/request";
 
 export default {
   name: "TeacherView",
+  /**
+   * @description 组件数据
+   * @returns {Object} 包含试卷信息、题目列表、答题记录等数据
+   */
   data() {
     return {
       paper: {},
@@ -171,7 +183,10 @@ export default {
   },
 
   methods: {
-    // 显示选择该选项的用户
+    /**
+     * @description 显示选择该选项的用户列表
+     * @param {Object} option - 选项对象,包含text、count、users等属性
+     */
     showUsers(option) {
       this.selectedUsers = [];
       this.AlluserAnswers.forEach(answer => {
@@ -183,6 +198,9 @@ export default {
       this.showUserDialog = true;
     },
 
+    /**
+     * @description 显示填空题的详细作答情况
+     */
     displayFillInUsers() {
       this.questions.forEach((question) => {
         if (question.type === 'fill-in') {
@@ -201,7 +219,9 @@ export default {
         }
       });
     },
-    // 统计单选题的选项情况
+    /**
+     * @description 统计单选题的选项选择情况
+     */
     countSingleChoiceAnswers() {
       this.AlluserAnswers.forEach(userAnswer => {
         const answers = userAnswer.testrecord.split('#');
@@ -220,7 +240,9 @@ export default {
       });
     },
 
-    // 解析所有用户的答题记录并统计
+    /**
+     * @description 解析所有用户的答题记录并统计
+     */
     countAnswers() {
       this.countSingleChoiceAnswers();
       this.displayFillInUsers();

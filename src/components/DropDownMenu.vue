@@ -1,8 +1,17 @@
+<!--
+  下拉菜单组件
+  
+  @component DropDownMenu
+  @description 可自定义菜单项的下拉选择组件，支持高亮显示选中项
+  @author 党建系统开发团队
+-->
 <template>
+  <!-- 下拉菜单 -->
   <el-dropdown style="margin-left: 15px" @command="handleCommand">
     <span class="click-able">
       分类<i class="el-icon-arrow-down el-icon--right"></i>
     </span>
+    <!-- 下拉菜单项 -->
     <el-dropdown-menu slot="dropdown" class="dropdown-menu">
       <el-dropdown-item
           v-for="(item, index) in menuItems"
@@ -21,6 +30,12 @@
 export default {
   name: "DropDownMenu",
   props: {
+    /**
+     * 菜单项列表
+     * @type {Array}
+     * @property {String} label - 菜单项显示文本
+     * @property {String} icon - 菜单项图标
+     */
     menuItems: {
       type: Array,
       required: true,
@@ -33,6 +48,12 @@ export default {
     };
   },
   methods: {
+    /**
+     * 处理菜单项选择
+     * 
+     * @param {Number} command - 选中的菜单项索引
+     * @emits filterType - 触发过滤类型选择事件
+     */
     handleCommand(command) {
       this.selectedIndex = command;
       this.$emit('filterType', command);

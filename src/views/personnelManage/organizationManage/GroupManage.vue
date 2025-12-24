@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component GroupManage
+ * @description 党小组管理页面 - 管理党小组、小组成员和组长分配
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 党小组管理容器 -->
   <div>
     <div v-show="isMenu">
       <el-container>
@@ -94,15 +102,25 @@ export default {
   name: "GroupManage",
   data() {
     return {
+      /** 当前支部ID */
       bid: 0,
+      /** 是否显示主菜单（小组列表） */
       isMenu: true,
+      /** 是否显示添加成员对话框 */
       add_show: false,
+      /** 当前支部信息 */
       branch: {},
+      /** 当前展示的小组ID */
       showGid: -1,
+      /** 当前展示的小组信息 */
       show_group: {},
+      /** 小组列表 */
       groups: [],
+      /** 小组成员列表 */
       users: [],
+      /** 选中的用户ID数组 */
       value1: [],
+      /** 所有用户列表 */
       allUsers: [],
     }
   },
@@ -114,6 +132,10 @@ export default {
 
   },
   methods: {
+    /**
+     * 获取支部名称
+     * 从服务器加载当前支部的详细信息
+     */
     getBranchName() {
       this.$request.get("/branch/selectByBid/" + this.bid).then(
           res => {
@@ -125,10 +147,19 @@ export default {
         console.error('数据加载出错', error);
       })
     },
+    /**
+     * 筛选可选用户
+     * 过滤掉已在当前小组的用户，返回可添加的用户列表
+     * @returns {Array} 可添加的用户列表
+     */
     selectUsers() {
       console.log(this.showGid);
       return this.allUsers.filter(user => user.gid != this.showGid);
     },
+    /**
+     * 添加新成员到小组
+     * 将选中的用户批量添加到当前小组
+     */
     addNewUsers() {
       console.log(this.value1);
       this.$request.put("/user/setgid?gid=" + this.showGid, this.value1).then(
@@ -143,6 +174,10 @@ export default {
         console.error('数据加载出错', error);
       })
     },
+    /**
+     * 获取所有用户
+     * 从服务器加载系统中的所有用户信息
+     */
     getalluser() {
       this.$request.get("/user/selectAll").then(
           res => {
@@ -155,6 +190,11 @@ export default {
         console.error('数据加载出错', error);
       })
     },
+    /**
+     * 从小组中移除成员
+     * 弹出确认框后将用户从当前小组中移除
+     * @param {Object} user - 要移除的用户对象
+     */
     deleteUserFromGroup(user) {
       console.log(user);
       MessageBox.confirm('确定删除？', '删除成员', {
@@ -177,6 +217,11 @@ export default {
       });
 
     },
+    /**
+     * 显示小组成员
+     * 切换到小组成员管理视图
+     * @param {Object} group - 要查看的小组对象
+     */
     showGroup(group) {
       this.show_group = group;
       console.log(this.show_group);
@@ -184,10 +229,18 @@ export default {
       this.showGid = group.gid;
       this.getUser();
     },
+    /**
+     * 关闭小组详情视图
+     * 返回到小组列表主菜单
+     */
     showClose() {
       this.isMenu = true;
       this.showGid = -1;
     },
+    /**
+     * 获取支部下的所有小组
+     * 从服务器加载当前支部的所有小组列表
+     */
     getGroup() {
       this.$request.get("/group/selectByBid/" + this.bid).then(
           res => {
@@ -199,6 +252,10 @@ export default {
         console.error('数据加载出错', error);
       })
     },
+    /**
+     * 获取小组成员
+     * 从服务器加载当前小组的所有成员
+     */
     getUser() {
       this.$request.get("/user/selectByGid/" + this.showGid).then(
           res => {
@@ -211,10 +268,19 @@ export default {
         console.error('数据加载出错', error);
       })
     },
+    /**
+     * 打开添加成员对话框
+     * 显示对话框并加载所有用户数据
+     */
     adduser() {
       this.add_show = true;
       this.getalluser();
     },
+    /**
+     * 设置小组组长
+     * 将指定用户设置为当前小组的组长
+     * @param {number} id - 用户ID
+     */
     setLeader(id) {
       console.log(id);
       let group = {
@@ -233,6 +299,10 @@ export default {
         this.$message.error('修改失败，请稍后再试');
       });
     },
+    /**
+     * 添加新小组
+     * 弹出输入框让用户输入小组名称并创建
+     */
     addGroup() {
       MessageBox.prompt('请输入新小组名称', '添加小组', {
         confirmButtonText: '确定',
@@ -254,6 +324,11 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 重命名小组
+     * 弹出输入框让用户修改小组名称
+     * @param {number} id - 小组ID
+     */
     renameGroup(id) {
       MessageBox.prompt('请输入新名称', '编辑小组名称', {
         confirmButtonText: '确定',
@@ -277,6 +352,11 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 删除小组
+     * 删除指定的小组
+     * @param {number} id - 小组ID
+     */
     deletegroup(id) {
       this.$request.delete("/group/delete/" + id).then(
           res => {
@@ -289,6 +369,10 @@ export default {
         console.error('数据加载出错', error);
       })
     },
+    /**
+     * 返回上一页
+     * 使用路由导航返回到上一个页面
+     */
     routereturn() {
       this.$router.back();
     },

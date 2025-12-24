@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component TestPaperDetail
+ * @description 试卷列表管理 - 展示所有试卷,支持搜索、排序、查看统计和参与答题
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 试卷列表容器 -->
   <div class="testpaper-container">
     <el-card class="testpaper-card">
       <div >
@@ -47,6 +55,10 @@
 import request from "@/utils/request";
 
 export default {
+  /**
+   * @description 组件数据
+   * @returns {Object} 包含排序类型和试卷列表
+   */
   data() {
     return {
       sortType: 'desc',
@@ -54,14 +66,25 @@ export default {
     };
   },
   methods: {
+    /**
+     * @description 获取所有试卷列表
+     */
     fetchTestPapers() {
       request.get("/papers").then((res) => {
         this.testPapers = res.data;
       });
     },
+    /**
+     * @description 跳转到答题页面
+     * @param {Number} id - 试卷ID
+     */
     handlePaperClick(id) {
       this.$router.push({ path: "/Exam", query: { id } });
     },
+    /**
+     * @description 跳转到统计页面
+     * @param {Number} id - 试卷ID
+     */
     handlePaperClicktoS(id) {
       this.$router.push({ path: "/Statistics", query: { id } });
     },

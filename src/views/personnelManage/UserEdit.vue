@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component UserEdit
+ * @description 用户编辑页面 - 管理员修改用户密码、积分和身份
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 用户编辑表单容器 -->
   <div style="display: flex;justify-content: center;align-items: center;justify-content: center;flex-grow: 1;">
     <div>
       <el-form ref="form" :model="formData" label-width="80px" size="mini">
@@ -41,7 +49,9 @@ export default {
   },
   data() {
     return {
+      /** 当前编辑者（管理员）的信息 */
       editor: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 用户编辑表单数据 */
       formData: {}
     };
   },
@@ -54,9 +64,18 @@ export default {
     }
   },
   methods: {
+    /**
+     * 处理身份选择改变
+     * 当用户选择不同的身份时，更新formData中的cid字段
+     * @param {string} value - 选中的身份ID（1-管理员, 2-拟稿员, 3-审核员, 4-普通用户）
+     */
     handleCidChange(value) {
       this.formData.cid = value;
     },
+    /**
+     * 提交用户信息修改
+     * 向父组件发送更新事件并提交修改到服务器
+     */
     onSubmit() {
       this.$emit('update-user', this.formData);
       this.$request.put('user/update',this.formData).then(

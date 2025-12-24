@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component AuditEditorPage
+ * @description 审核编辑器页面 - 审核人员可在审核过程中修改文章内容
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 审核编辑器容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;">
     <el-menu class="draft-menu" mode="horizontal">
       <div style="float: left;color: #fbfbfb">
@@ -84,13 +92,22 @@ export default {
     this.initWangEditor(this.draft.content);
   },
   methods: {
+    /**
+     * 返回上一页
+     */
     goBack() {
       this.$router.go(-1);
     },
+    /**
+     * 预览文章
+     */
     preview() {
       this.draft.content = this.editor.txt.html()
       this.dialogVisible = true;
     },
+    /**
+     * 获取编辑器内容
+     */
     getContent() {
       // 获取编辑框内容
       this.draft.content = this.editor.txt.html()

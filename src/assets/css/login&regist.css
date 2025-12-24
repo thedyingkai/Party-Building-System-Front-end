@@ -38,17 +38,24 @@
 }
 
 .login_form .button-container {
-    display: flex; /* 使用 flex 布局 */
-    width: 100%; /* 可选：根据需要设置容器的宽度 */
-    justify-content: space-between; /* 可选：在按钮之间添加间距 */
-    margin-top: 20px; /* 可选：根据需要设置上边距 */
+    display: flex;
+    /* 使用 flex 布局 */
+    width: 100%;
+    /* 可选：根据需要设置容器的宽度 */
+    justify-content: space-between;
+    /* 可选：在按钮之间添加间距 */
+    margin-top: 20px;
+    /* 可选：根据需要设置上边距 */
 }
 
 .login_form .el-button {
     /*margin: 0; !* 移除按钮的默认外边距 *!*/
-    padding: 15px 30px; /* 根据需要调整内边距 */
-    text-align: center; /* 确保按钮内的文本居中（虽然这通常是默认的） */
-    box-sizing: border-box; /* 包括内边距和边框在内计算按钮的总宽度 */
+    padding: 15px 30px;
+    /* 根据需要调整内边距 */
+    text-align: center;
+    /* 确保按钮内的文本居中（虽然这通常是默认的） */
+    box-sizing: border-box;
+    /* 包括内边距和边框在内计算按钮的总宽度 */
 }
 
 a {
@@ -71,5 +78,3 @@ a {
 /*    background-color: #fa1a00 !important;*/
 /*    color: #ffffff !important;*/
 /*}*/
-
-

@@ -1,10 +1,21 @@
+<!--
+  图片轮播组件
+  
+  @component ImgCarousel
+  @description 首页轮播图组件，支持点击切换和页码显示
+  @author 党建系统开发团队
+-->
 <template>
   <div class="ImgCarousel">
+    <!-- 轮播组件 -->
     <el-carousel :height="carouselHeight" trigger="click">
       <el-carousel-item v-for="(item, index) in carouselItems" :key="index" :current-index="currentIndex">
         <a :href="item.link" target="_blank">
+          <!-- 轮播项文本 -->
           <div class="txt">{{ item.text }}</div>
+          <!-- 轮播项图片 -->
           <div :style="{ backgroundImage: `url(${item.url})` }" class="img"></div>
+          <!-- 页码信息 -->
           <div class="page-info">
             <div class="current"> {{ item.index}}</div>
             <div class="total">/{{ carouselItems.length }}</div>
@@ -19,6 +30,13 @@
 export default {
   name: "ImgCarousel",
   props: {
+    /**
+     * 轮播项列表
+     * @type {Array}
+     * @property {String} imageUrl - 图片URL
+     * @property {String} text - 显示文本
+     * @property {String} link - 跳转链接
+     */
     carouselItems: {
       type: Array,
       required: true,
@@ -27,6 +45,10 @@ export default {
         return value.every(item => typeof item.imageUrl === 'string' && item.imageUrl.trim() !== '');
       }
     },
+    /**
+     * 轮播器高度
+     * @type {String}
+     */
     carouselHeight: {
       type: String,
       default: '150px' // 默认轮播器高度
@@ -34,10 +56,16 @@ export default {
   },
   data() {
     return {
-      currentIndex: 0 // 初始化为第一项
+      // 当前轮播项索引
+      currentIndex: 0
     };
   },
   methods: {
+    /**
+     * 处理轮播切换
+     * @param {number} index - 新的轮播项索引
+     * @description 更新当前轮播项索引
+     */
     handleCarouselChange(index) {
       this.currentIndex = index;
     }

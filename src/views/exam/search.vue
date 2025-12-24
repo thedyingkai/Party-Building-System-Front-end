@@ -1,3 +1,10 @@
+<!--
+  试题搜索页面
+  
+  @component search
+  @description 试题库查询和管理页面，支持试题搜索、分页显示和批量操作
+  @author 党建系统开发团队
+-->
 <!--<template xmlns="http://www.w3.org/1999/html">-->
 <!--  <div>-->
 <!--    <div>-->
@@ -193,6 +200,10 @@ import request from "@/utils/request";
 
 export default {
   name: "search",
+  /**
+   * @description 组件数据
+   * @returns {Object} 包含表格数据、分页参数、搜索条件等
+   */
   data() {
     return {
       tableData: [],        //动态传入页面数据
@@ -216,6 +227,10 @@ export default {
   updated() {
   },
   methods: {
+    /**
+     * @description 查看题目详情
+     * @param {Object} row - 题目行数据
+     */
     handleView(row) {
       this.$msgbox({
         dangerouslyUseHTMLString: true,
@@ -225,6 +240,9 @@ export default {
       }).catch(e => {
       })
     },
+    /**
+     * @description 执行查询操作,根据搜索条件查询或显示全部题目
+     */
     handleQuery() {
       if (this.value === '' || this.keyword === '') {
         this.tableData = [];
@@ -233,23 +251,43 @@ export default {
         this.searchQuestions();
       }
     },
+    /**
+     * @description 加载数据(预留分页查询接口)
+     */
     load() {
 
       //分页查询
     },
+    /**
+     * @description 处理页码变化
+     * @param {Number} pageNum - 新的页码
+     */
     handleCurrentChange(pageNum) {
       this.pageNum = pageNum;
     },
+    /**
+     * @description 对表格数据进行分页切片
+     * @returns {Array} 当前页的数据
+     */
     sliceDate() {
       return this.tableData.slice(this.pageSize * (this.pageNum - 1), this.pageSize * (this.pageNum))
     },
+    /**
+     * @description 清空搜索条件
+     */
     handleClean() {
       this.keyword = '';
       this.value = '';
     },
+    /**
+     * @description 重置数据(预留方法)
+     */
     reset() {//清除重置
 
     },
+    /**
+     * @description 获取所有题目数据(判断题、选择题、填空题)
+     */
     allQuestions() {
       request.get('/questions/tf').then((res) => {
         let questions = res.data;
@@ -328,6 +366,9 @@ export default {
         })
       })
     },
+    /**
+     * @description 根据搜索条件搜索题目
+     */
     searchQuestions() {
       this.tableData = [];
       request.get("/questions/tf/search/" + this.value + "/" + this.keyword.toString()).then(res => {

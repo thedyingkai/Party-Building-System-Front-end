@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component DraftAuditList
+ * @description 草稿审核列表页面 - 审核人员处理待审核的文章草稿
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 草稿审核列表容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-table v-loading="loading"
               :cell-style="{ padding: '0px' }" :data="returntable.filter(data =>!search || (data.title?.toLowerCase()?.includes(search.toLowerCase()))
@@ -86,30 +94,47 @@ export default {
   components: {AuditForm, ArticleView},
   data() {
     return {
+      /** 当前登录的审核员信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 待审核草稿列表数据 */
       tableData: [],
+      /** 搜索关键字 */
       search: '',
+      /** 加载状态 */
       loading: true,
+      /** 当前审核的草稿信息 */
       draft: {
-        id: 0,
-        aid:0,
-        next:0,
-        srid:0,
-        source: '',
-        title: '',
-        content: '',
-        column:'',
+        id: 0,         // 草稿ID
+        aid: 0,        // 审核记录ID
+        next: 0,       // 下一级审核ID
+        srid: 0,       // 提交记录ID
+        source: '',    // 来源
+        title: '',     // 标题
+        content: '',   // 内容
+        column: '',    // 所属栏目
       },
+      /** 审核对话框显示状态 */
       dialogVisible: false,
-      currentPage: 1, // 当前页码
-      total: 0, // 总数据量
+      /** 当前页码 */
+      currentPage: 1,
+      /** 总记录数 */
+      total: 0,
+      /** 每页显示数量 */
       pageSize: 5,
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载后加载待审核列表
+   */
   mounted() {
     this.loadData();
   },
   methods: {
+    /**
+     * 编辑文章
+     * 跳转到审核编辑页面
+     * @param {Object} row - 文章数据
+     */
     handleEdit(row) {
       this.$router.push({
         name: '审核文章编辑',
@@ -123,6 +148,9 @@ export default {
         }
       });
     },
+    /**
+     * 加载待审核的草稿列表
+     */
     loadData() {
       console.log(this.user);
       this.loading = true;
@@ -140,19 +168,38 @@ export default {
         this.loading = false;
       });
     },
+    /**
+     * 处理每页条数变化
+     * @param {number} newSize - 新的每页条数
+     */
     handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
+    /**
+     * 处理页码变化
+     * @param {number} newPage - 新的页码
+     */
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
       this.fetchData();
     },
+    /**
+     * 移除HTML标签
+     * @param {string} html - HTML内容
+     * @returns {string} 纯文本内容
+     */
     stripHtmlTags(html) {
       let tmp = document.createElement("DIV");
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText;
     },
+    /**
+     * 审核草稿
+     * 锁定草稿并打开审核对话框
+     * @param {number} index - 表格索引
+     * @param {Object} row - 草稿数据行
+     */
     audit(index, row) {
       this.$request.put('/draft/lock/' + row.id).then(
           res => {
@@ -172,12 +219,26 @@ export default {
           }
       );
     },
+    /**
+     * 删除草稿
+     * @param {number} index - 索引
+     * @param {Object} row - 数据行
+     */
     handleDelete(index, row) {
       console.log(index, row);
     },
+    /**
+     * 处理输入事件
+     * @param {Event} event - 输入事件
+     */
     handleInput(event) {
       console.log(event);
     },
+    /**
+     * 获取HTML中的第一张图片
+     * @param {string} htmlContent - HTML内容
+     * @returns {string|null} 图片URL
+     */
     getFirstImage(htmlContent) {
       if (htmlContent) {
         let tmp = document.createElement("DIV");
@@ -189,6 +250,12 @@ export default {
       }
       return null;
     },
+    /**
+     * 计算图片宽度
+     * 根据图片宽高比计算显示宽度
+     * @param {string} htmlContent - HTML内容
+     * @returns {Promise<string>|string} 图片宽度
+     */
     getImageWidth(htmlContent) {
       const img = this.getFirstImage(htmlContent);
       if (img) {
@@ -206,6 +273,11 @@ export default {
       }
       return '0px';
     },
+    /**
+     * 提交审核结果
+     * 验证表单并提交审核意见
+     * @param {Object} draft - 草稿对象
+     */
     submitAudit(draft) {
       const auditForm = this.$refs.auditFormRef;
       auditForm.validateForm().then(() => {// 表单验证通过
@@ -228,6 +300,10 @@ export default {
         console.log('请完善审核信息');
       });
     },
+    /**
+     * 取消审核
+     * 解锁草稿并关闭对话框
+     */
     cancel() {
       this.$request.put('/draft/unlock/' + this.draft.id).then(
           res => {
@@ -244,6 +320,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * 返回当前页的草稿数据
+     * @returns {Array} 分页后的草稿列表
+     */
     returntable() {
       return this.tableData.slice(this.pageSize * (this.currentPage - 1), this.pageSize * this.currentPage);
     }

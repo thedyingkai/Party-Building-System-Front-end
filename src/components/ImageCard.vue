@@ -1,8 +1,17 @@
+<!--
+  图片卡片组件
+  
+  @component ImageCard
+  @description 显示图片或文件图标的卡片组件，支持预览功能
+  @author 党建系统开发团队
+-->
 <template>
   <div :class="showType" :style="{'height':totalHeight}">
     <!-- 图片展示比例为 16:9 ，比例不符合的图片会自适应裁剪-->
     <div>
+      <!-- 图片区域 -->
       <div :class="showType+'-img'">
+        <!-- 图片展示 -->
         <div v-if="isImage" class="image-container">
           <img v-if="!loading" :alt="imageInfo"
                :class="'img-'+showType"
@@ -11,6 +20,7 @@
                @click="handleClick"/>
           <div v-else class="loading-animation">Loading...</div>
         </div>
+        <!-- 文件图标展示 -->
         <div v-else>
           <img v-if="!loading" :alt="imageInfo"
                :class="'img-'+showType" :src="iconUrl"
@@ -19,6 +29,7 @@
           <div v-else class="loading-animation">Loading...</div>
         </div>
       </div>
+      <!-- 标题区域 -->
       <div :class="showType+'-title'">
         <div :style="{'max-width': maxWidth}"
              :title="title"
@@ -29,7 +40,7 @@
         <div :style="{'max-width': maxWidth,'color':'#adadad','font-size':'13px'}">{{ subTitle }}</div>
       </div>
     </div>
-    <!-- 对话框组件 -->
+    <!-- 预览对话框 -->
     <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
       <div style="display: flex;flex-direction: column;align-items: center;">
         <p style="width: 100%">{{ description }}</p>
@@ -43,37 +54,85 @@
 export default {
   name: "ImageCard",
   props: {
+    /**
+     * 资源ID
+     * @type {Number}
+     */
     id: {type: Number},
+    /**
+     * 图片URL
+     * @type {String}
+     */
     url: {
       type: String,
       default: '/img/dsjtjt.jpg'
     },
+    /**
+     * 图片信息描述
+     * @type {String}
+     */
     imageInfo: String,
+    /**
+     * 标题
+     * @type {String}
+     */
     title: String,
+    /**
+     * 副标题
+     * @type {String}
+     */
     subTitle: String,
+    /**
+     * 详细描述
+     * @type {String}
+     */
     description: {
       type: String, default: '暂无描述'
     },
+    /**
+     * 图片填充方式
+     * @type {String}
+     */
     objectFit: {
       type: String,
       default: 'cover'
     },
+    /**
+     * 最大宽度
+     * @type {String}
+     */
     maxWidth: {
       type: String,
       default: '100%'
     },
+    /**
+     * 最大高度
+     * @type {String}
+     */
     maxHeight: {
       type: String,
       default: '200px'
     },
+    /**
+     * 显示类型
+     * @type {String}
+     */
     showType: {
       type: String,
       default: 'image-card'
     },
+    /**
+     * 总高度
+     * @type {String}
+     */
     totalHeight: {
       type: String,
       default: '200px',
     },
+    /**
+     * 总宽度
+     * @type {String}
+     */
     totalWidth: {
       type: String,
       default: '56px',
@@ -81,8 +140,11 @@ export default {
   },
   data() {
     return {
+      // 是否为图片文件
       isImage: true,
+      // 文件图标URL
       iconUrl: '',
+      // 文件类型到图标的映射
       iconMap: {
         'image/jpeg': 'https://pan-yz.cldisk.com/static/pc/images/icon/image.png',
         'image/png': 'https://pan-yz.cldisk.com/static/pc/images/icon/image.png',
@@ -103,14 +165,25 @@ export default {
         'video/webm': 'https://pan-yz.cldisk.com/static/pc/images/icon/video.png',
         'default': '/icons/default-icon.png'
       },
+      // 加载状态
       loading: false,
-      dialogVisible: false // 新增对话框显示状态
+      // 对话框显示状态
+      dialogVisible: false
     };
   },
+  /**
+   * 组件创建时
+   * @description 检查文件类型并加载对应图标
+   */
   created() {
     this.checkFileType();
   },
   methods: {
+    /**
+     * 处理卡片点击事件
+     * @description 根据 showType 决定是触发事件还是预览文件
+     * @emits image-clicked - 当 showType 为 image-card 时触发
+     */
     handleClick() {
       if (this.showType === 'image-card') {
         this.$emit('image-clicked', this.id);
@@ -133,6 +206,11 @@ export default {
         this.dialogVisible = true;
       }
     },
+    /**
+     * 预览图片
+     * @returns {Promise} Promise 对象
+     * @description 在新窗口中打开图片
+     */
     previewImage() {
       return new Promise((resolve) => {
         const imageWindow = window.open('', '_blank');
@@ -140,6 +218,11 @@ export default {
         resolve();
       });
     },
+    /**
+     * 预览视频
+     * @returns {Promise} Promise 对象
+     * @description 在新窗口中打开视频
+     */
     previewVideo() {
       return new Promise((resolve) => {
         const videoWindow = window.open('', '_blank');
@@ -147,6 +230,11 @@ export default {
         resolve();
       });
     },
+    /**
+     * 预览PDF文件
+     * @returns {Promise} Promise 对象
+     * @description 在新窗口中打开PDF文件
+     */
     previewPDF() {
       return new Promise((resolve) => {
         const pdfWindow = window.open('', '_blank');
@@ -154,6 +242,10 @@ export default {
         resolve();
       });
     },
+    /**
+     * 下载文件
+     * @description 触发浏览器下载指定文件
+     */
     downloadFile() {
       const fileName = this.url.split('/').pop();
       const a = document.createElement('a');
@@ -164,6 +256,10 @@ export default {
       document.body.removeChild(a);
       this.loading = false;
     },
+    /**
+     * 检查文件类型
+     * @description 根据文件扩展名判断文件类型并设置对应图标
+     */
     checkFileType() {
       const fileType = this.url.split('.').pop().toLowerCase();
       if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileType)) {
@@ -192,6 +288,10 @@ export default {
         this.iconUrl = this.iconMap['default'];
       }
     },
+    /**
+     * 预览文件内容
+     * @description 根据文件类型调用对应的预览方法
+     */
     previewContent() {
       // 触发原来的预览操作
       const fileExtension = this.url.split('.').pop().toLowerCase();

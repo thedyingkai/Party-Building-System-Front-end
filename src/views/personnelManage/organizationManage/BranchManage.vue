@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component BranchManage
+ * @description 支部管理页面 - 管理党支部的增删改、党小组和支部委员配置
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 支部管理容器 -->
   <div>
     <el-container>
       <el-header style="margin: 20px;width: 80vw;text-align: center">
@@ -47,22 +55,41 @@ export default {
   name: 'BranchManage',
   data() {
     return {
+      /** 测试字段1 */
       test1: '',
+      /** 对话框显示状态 */
       dialogVisible: false,
+      /** 新支部名称 */
       newBranch: '',
+      /** 支部列表 */
       branches: [],
+      /** 当前显示的支部 */
       showBranch: {},
     }
   },
   methods: {
+    /**
+     * 设置支部委员
+     * 跳转到支部委员管理页面
+     * @param {Object} branch - 支部对象
+     */
     setManager(branch) {
       this.showBranch = branch;
       this.$router.push({name: '委员会', params: {id: branch.bid}})
     },
+    /**
+     * 进入党小组管理
+     * 跳转到指定支部的党小组管理页面
+     * @param {number} gid - 支部ID（此处参数名为gid但实际为bid）
+     */
     enterGroup(gid) {
       console.log(gid);
       this.$router.push({name: '党小组', params: {id: gid}})
     },
+    /**
+     * 获取支部列表
+     * 从服务器加载所有支部信息
+     */
     getBranch() {
       this.$request.get("/branch/selectAll").then(
           res => {
@@ -74,6 +101,10 @@ export default {
         console.error('数据加载出错', error);
       })
     },
+    /**
+     * 添加支部
+     * 弹出输入框让用户输入支部名称并创建新支部
+     */
     addBranch() {
       MessageBox.prompt('请输入新支部名称', '添加支部', {
         confirmButtonText: '确定',
@@ -95,6 +126,11 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 删除支部
+     * 弹出确认框后删除选中的支部及其下属小组
+     * @param {number} id - 支部ID
+     */
     deleteBranch(id) {
       MessageBox.confirm('确定删除该支部？支部下的小组将一起被删除', '删除支部', {
         confirmButtonText: '确定',
@@ -115,6 +151,11 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 重命名支部
+     * 弹出输入框让用户修改支部名称
+     * @param {number} id - 支部ID
+     */
     renameBranch(id) {
       // 弹出对话框编辑节点
       MessageBox.prompt('请输入新名称', '编辑支部名称', {

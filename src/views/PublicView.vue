@@ -1,15 +1,26 @@
+<!--
+  公共站点首页
+  
+  @component PublicView
+  @description 党建系统对外展示的公共首页，包含完整导航菜单和页脚信息
+  @author 党建系统开发团队
+-->
 <template>
   <body class="idx">
+  <!-- 顶部导航栏 -->
   <div class="headerUe">
     <div class="wp">
       <span class="menuBtn"></span>
+      <!-- Logo -->
       <a class="logo" href="index.htm"><img
           :src=" require('../assets/img/logo.png')" alt=""/></a>
+      <!-- 主导航菜单 -->
       <ul class="nav">
+        <!-- 首页 -->
         <li>
           <a class="v1" href="index.htm">首页</a>
-
         </li>
+        <!-- 主题专栏 -->
         <li>
           <a class="v1" href="djyw.htm">主题专栏</a>
           <div class="dropIcon"></div>
@@ -17,8 +28,8 @@
             <a class="v2" href="qhdzzjl95zn/qhds.htm">党的政策</a>
             <a class="v2" href="qhdzzjl95zn/sdxf.htm">热点事件</a>
           </div>
-
         </li>
+        <!-- 理论专栏 -->
         <li>
           <a class="v1" href="tzgg.htm">理论专栏</a>
           <div class="dropIcon"></div>
@@ -148,13 +159,21 @@ export default {
   },
   data() {
     return {
+      // 顶部导航菜单数据
       menuData: [],
     };
   },
+  /**
+   * 组件创建时获取栏目数据
+   */
   created() {
     this.getColumn();
   },
   methods: {
+    /**
+     * 获取栏目数据
+     * 从后端获取所有需要展示的栏目信息并构建导航菜单
+     */
     getColumn() {
       this.$request.get('/column/selectAllToShow').then(
           res => {

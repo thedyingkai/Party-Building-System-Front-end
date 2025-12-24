@@ -1,3 +1,10 @@
+<!--
+  在线自测页面
+  
+  @component SelfExam
+  @description 在线答题和自测页面，支持单选、多选、填空和判断题型
+  @author 党建系统开发团队
+-->
 <template xmlns="http://www.w3.org/1999/html">
   <div id="app" class="container">
     <!-- 题目标题 -->
@@ -103,6 +110,10 @@ import user from "@/views/exam/User.vue";
 
 export default {
   name: "Exam",
+  /**
+   * @description 组件数据
+   * @returns {Object} 包含题目列表、用户答案、当前索引、得分等数据
+   */
   data() {
     return {
       done: false,
@@ -181,9 +192,18 @@ export default {
         }
       },
   methods: {
+    /**
+     * @description 返回首页
+     */
     returnHome() {
       this.$router.push({path: "/Home"});
     },
+    /**
+     * @description 从数组中随机获取指定数量的元素
+     * @param {Array} arr - 源数组
+     * @param {Number} num - 需要获取的元素数量
+     * @returns {Array} 随机选择的元素数组
+     */
     getRandomElements(arr, num) {
       const shuffled = arr.slice();
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -192,6 +212,9 @@ export default {
       }
       return shuffled.slice(0, num);
     },
+    /**
+     * @description 更新用户答案数组,根据题型初始化不同的答案格式
+     */
     updateAnswer() {
       this.userAnswers = this.questions.map((question) => {
         if (question.type === 'single') {
@@ -203,25 +226,33 @@ export default {
         }
       });
     },
-    // 上一题
+    /**
+     * @description 切换到上一题
+     */
     prevQuestion() {
       if (this.currentIndex > 0) {
         this.currentIndex -= 1;
       }
     },
-    // 下一题
+    /**
+     * @description 切换到下一题
+     */
     nextQuestion() {
       if (this.currentIndex < this.questions.length - 1) {
         this.currentIndex += 1;
       }
     },
-    // 提交答案
+    /**
+     * @description 提交答案,显示结果和得分
+     */
     submitAnswers() {
       this.done = true;
       this.showResult = true;
       this.calculateScore();
     },
-    // 计算得分
+    /**
+     * @description 计算得分,每题10分
+     */
     calculateScore() {
       this.score = 0;
       console.log(this.questions.length)

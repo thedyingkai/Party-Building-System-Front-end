@@ -1,14 +1,24 @@
+<!--
+  单图片上传器组件
+  
+  @component SingleImageUploader
+  @description 单张图片上传组件，支持预览、更换和删除
+  @author 党建系统开发团队
+-->
 <template>
   <div class="container">
+    <!-- 上传组件 -->
     <el-upload ref="uploadRef" v-model="files" :auto-upload="false" :file-list="files"
                :http-request="uploadSubmit" :limit="limit" :multiple="limit>1" :on-change="handleChange"
                :on-exceed="handleExceed" :show-file-list="false" accept="image/*"
                :action="uploadAction">
       <template #trigger>
         <div @click="isUserSelecting = true">
+          <!-- 占位图标 -->
           <i v-if="files.length === 0" class="el-icon-plus cover-uploader-icon"></i>
         </div>
       </template>
+      <!-- 图片预览 -->
       <ul class="viewBox">
         <li v-for="(file,index) of files" :key="index">
           <el-tooltip class="click-able" content="点击以更换图片" effect="light" popper-class="tip-message">
@@ -22,7 +32,9 @@
         </li>
       </ul>
     </el-upload>
+    <!-- 上传按钮 -->
     <el-button size="small" style="margin: 5px;" type="success" @click="handleUpload">上传</el-button>
+    <!-- 图片查看器 -->
     <el-image-viewer v-if="showImageView" :on-close="closeViewer" :url-list="urls"
                      style="z-index: 99999;"></el-image-viewer>
   </div>
@@ -37,6 +49,10 @@ export default {
     ElImageViewer,
   },
   props: {
+    /**
+     * 最大上传数量
+     * @type {Number}
+     */
     limit: {
       type: Number,
       default: 1
@@ -44,19 +60,35 @@ export default {
   },
   data() {
     return {
+      // 文件列表
       files: [],
+      // 图片URL列表（用于查看器）
       urls: [],
+      // 当前用户
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      // 是否为用户选择操作
       isUserSelecting: false,
+      // 是否显示图片查看器
       showImageView: false,
     };
   },
   computed: {
+    /**
+     * 上传接口地址
+     * @returns {string} 完整的上传API URL
+     */
     uploadAction() {
       return `${process.env.VUE_APP_BASEURL}/file/upload`;
     },
   },
   methods: {
+    /**
+     * 执行文件上传
+     * @param {Object} options - 上传选项对象
+     * @param {File} options.file - 要上传的文件
+     * @description 将图片上传到服务器并触发更新事件
+     * @emits updateQuery - 上传成功后触发，传递图片URL
+     */
     async uploadSubmit(options) {
       const formData = new FormData();
       formData.append('file', options['file']);
@@ -81,6 +113,12 @@ export default {
       }
       this.isUserSelecting = false;
     },
+    /**
+     * 处理文件变化
+     * @param {Object} uploadFile - 当前上传的文件
+     * @param {Array} uploadFiles - 所有上传的文件列表
+     * @description 当用户选择图片后，创建预览URL
+     */
     handleChange(uploadFile, uploadFiles) {
       if (this.isUserSelecting) {
         uploadFiles.map(item => {
@@ -89,9 +127,19 @@ export default {
         this.files = uploadFiles;
       }
     },
+    /**
+     * 执行上传
+     * @description 手动触发图片上传
+     */
     handleUpload() {
       this.$refs.uploadRef.submit();
     },
+    /**
+     * 处理文件超出限制
+     * @param {Array} files - 新选择的文件
+     * @param {Array} uploadfiles - 已上传的文件列表
+     * @description 当上传文件数量超过限制时，清空并重新开始
+     */
     handleExceed(files, uploadfiles) {
       if (this.limit === 1) {
         this.$refs.uploadRef.clearFiles();
@@ -100,18 +148,35 @@ export default {
         this.$message.error('最多允许上传' + this.limit + '张，已上传' + uploadfiles.length + '张，本次还可以上传' + (this.limit - uploadfiles.length) + '张');
       }
     },
+    /**
+     * 移除图片
+     * @param {number} index - 图片索引
+     * @description 从文件列表中移除指定图片
+     */
     remove(index) {
       this.files.splice(index, 1);
     },
+    /**
+     * 查看图片
+     * @description 打开图片查看器
+     */
     imageView() {
       this.showImageView = true;
       this.urls = this.files.map(file => {
         return file.url;
       });
     },
+    /**
+     * 关闭查看器
+     * @description 关闭图片查看器
+     */
     closeViewer() {
       this.showImageView = false;
     },
+    /**
+     * 处理图片点击
+     * @description 触发文件选择器打开
+     */
     handleImageClick() {
       this.isUserSelecting = true;
       this.$refs.uploadRef.$el.querySelector('input[type="file"]').click();

@@ -1,12 +1,23 @@
+<!--
+  评论组件
+  
+  @component ComMent
+  @description 显示评论列表，支持点赞、回复和删除功能
+  @author 党建系统开发团队
+-->
 <template>
   <div>
+    <!-- 评论列表表单 -->
     <el-form v-if="commentlist.length > 0">
       <el-form-item v-for="(comment, index) in commentlist" :key="index" style="margin-top: 20px;margin-left: 20px">
+    <!-- 用户头像 -->
     <el-col :span="1">
       <el-avatar :size="45" :src=comment.avatar></el-avatar>
     </el-col>
+    <!-- 评论内容区域 -->
     <el-col :span="22" style="margin-bottom: 10px;margin-left: 10px">
       <el-row>{{comment.uname}}</el-row><el-row>{{comment.content}}</el-row>
+      <!-- 时间、点赞、回复、删除 -->
       <el-row><el-col :span="4">{{comment.send_time}}</el-col>
         <el-col :span="2"><span class="icon" @click="toggleLike">{{ comment.like }}</span></el-col>
         <el-col :span="2"><el-button type="text" @click="reply(index)">回复</el-button></el-col>
@@ -36,6 +47,10 @@ export default {
   name: "ComMent",
   components: {ReplyShow},
   props:{
+    /**
+     * 文章ID
+     * @type {Number}
+     */
     getAid: {
       type: Number,
       required: true,
@@ -69,6 +84,12 @@ export default {
     this.getcommentlist();
   },
   methods: {
+    /**
+     * 删除评论
+     * 
+     * @param {Number} id - 评论ID
+     * @description 弹出确认对话框后删除指定评论
+     */
     deletecomment(id) {
       this.$confirm('您确定要删除此评论吗?', '提示', {
         confirmButtonText: '确定',
@@ -87,18 +108,34 @@ export default {
         });
       });
     },
+    /**
+     * 执行删除评论请求
+     * 
+     * @param {Number} id - 评论ID
+     */
     deletedata(id){
       this.$request.post('/comment/delete', id).then(
           res => this.handleResponse(res, () => {
           })
       )
     },
+    /**
+     * 初始化回复显示状态数组
+     * 
+     * @description 为每条评论创建回复框显示状态
+     */
     getreplyshow() {
       this.commentreplyshow = Array.from({length: this.length}, () => ({
         value: false
       }));
 
     },
+    /**
+     * 切换回复输入框显示
+     * 
+     * @param {Number} index - 评论索引
+     * @description 控制评论回复框的显示/隐藏
+     */
     reply(index) {
       if (this.commentreplyshow[index].value){
         this.commentreplyshow[index].value = false;
@@ -110,6 +147,13 @@ export default {
       }
 
     },
+    /**
+     * 判断是否可以删除评论
+     * 
+     * @param {Number} uid - 评论用户ID
+     * @returns {Boolean} 是否可删除
+     * @description 只有评论作者本人可以删除评论
+     */
     candelete(uid) {
       if (this.user.uid == uid) {
         return true;
@@ -117,8 +161,16 @@ export default {
         return false;
       }
     },
+    /**
+     * 切换点赞状态（功能占位）
+     */
     toggleLike() {
     },
+    /**
+     * 获取评论列表
+     * 
+     * @description 根据文章ID获取所有评论
+     */
     getcommentlist() {
       this.loading = true;
       this.$request.get('/comment/selectbyarticle/' + this.aid).then(
@@ -136,6 +188,12 @@ export default {
         this.loading = false;
       });
     },
+    /**
+     * 处理响应结果
+     * 
+     * @param {Object} res - 响应对象
+     * @param {Function} successCallback - 成功回调函数
+     */
     handleResponse(res, successCallback) {
       if (res.code === '200') {
         successCallback();
@@ -143,6 +201,12 @@ export default {
         this.$message.error(res.data.msg);
       }
     },
+    /**
+     * 提交回复
+     * 
+     * @param {Number} id - 父评论ID
+     * @description 提交用户的回复内容
+     */
     subreply(id){
       this.comment.parent_id=id;
       this.comment.content = this.input2;

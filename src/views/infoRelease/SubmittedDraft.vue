@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component SubmittedDraft
+ * @description 已提交草稿页面 - 展示用户已提交的草稿及审核状态
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 已提交草稿列表容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-table
         v-loading="loading"
@@ -110,28 +118,48 @@ export default {
   components: {ArticleView},
   data() {
     return {
+      /** 当前登录用户信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 草稿列表完整数据 */
       tableData: [],
+      /** 搜索关键字 */
       search: '',
+      /** 加载状态 */
       loading: true,
+      /** 当前预览的草稿对象 */
       draft: {
         id: '',
         source: '',
         title: '',
         content: '',
       },
-      currentPage: 1, // 当前页码
-      total: 0, // 总数据量
+      /** 当前页码 */
+      currentPage: 1,
+      /** 总记录数 */
+      total: 0,
+      /** 每页显示数量 */
       pageSize: 5,
+      /** 预览对话框显示状态 */
       dialogVisible: false,
+      /** 审核详情对话框显示状态 */
       dialogVisible_check: false,
+      /** 审核流程记录列表 */
       auditList: [],
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载后加载草稿列表
+   */
   mounted() {
     this.fetchData();
   },
   methods: {
+    /**
+     * 查看审核详情
+     * 显示草稿的审核流程和详细信息
+     * @param {number} index - 表格索引
+     * @param {Object} row - 草稿数据
+     */
     check(index, row) {
       this.auditList = [];
       this.dialogVisible_check = true;
@@ -174,14 +202,25 @@ export default {
         console.error('数据加载出现错误:', error);
       });
     },
+    /**
+     * 处理每页条数变化
+     * @param {number} newSize - 新的每页条数
+     */
     handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
+    /**
+     * 处理页码变化
+     * @param {number} newPage - 新的页码
+     */
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
       this.fetchData();
     },
+    /**
+     * 加载已提交的草稿列表
+     */
     fetchData() {
       this.loading = true; // 先将loading设置为true，表示正在加载数据
       let uid = this.user.uid;
@@ -198,11 +237,22 @@ export default {
         this.loading = false; // 如果请求出现错误，同样将loading设置为false，避免一直处于加载状态
       });
     },
+    /**
+     * 移除HTML标签
+     * @param {string} html - HTML内容
+     * @returns {string} 纯文本内容
+     */
     stripHtmlTags(html) {
       let tmp = document.createElement("DIV");
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText;
     },
+    /**
+     * 编辑草稿
+     * 检查审核状态后跳转到编辑页面
+     * @param {number} index - 表格索引
+     * @param {Object} row - 草稿数据
+     */
     handleEdit(index, row) {
       this.checkLatestStatus(row.id).then(latestStatus => {
         if (latestStatus === 4) {
@@ -227,12 +277,22 @@ export default {
         // 可以根据具体情况决定是否允许编辑或者给出更友好的提示
       });
     },
+    /**
+     * 预览草稿
+     * @param {number} index - 表格索引
+     * @param {Object} row - 草稿数据
+     */
     handlePreview(index, row) {
       this.draft.id = row.id;
       this.draft.title = row.title;
       this.draft.content = row.content;
       this.dialogVisible = true;
     },
+    /**
+     * 检查草稿最新状态
+     * @param {number} draftId - 草稿ID
+     * @returns {Promise} 返回状态值
+     */
     checkLatestStatus(draftId) {
       return this.$request.get('/draft/checkStatus/' + draftId).then(res => {
         if (res.code === '200') {
@@ -241,12 +301,26 @@ export default {
         throw new Error('获取状态失败');
       });
     },
+    /**
+     * 删除草稿
+     * @param {number} index - 表格索引
+     * @param {Object} row - 草稿数据
+     */
     handleDelete(index, row) {
       console.log(index, row);
     },
+    /**
+     * 处理输入事件
+     * @param {Event} event - 输入事件
+     */
     handleInput(event) {
       console.log(event);
     },
+    /**
+     * 获取HTML中的第一张图片
+     * @param {string} htmlContent - HTML内容
+     * @returns {string|null} 图片URL
+     */
     getFirstImage(htmlContent) {
       if (htmlContent) {
         let tmp = document.createElement("DIV");
@@ -258,7 +332,11 @@ export default {
       }
       return null;
     },
-    // 新增的计算图片等比例缩放后宽度的计算属性
+    /**
+     * 计算图片宽度
+     * @param {string} htmlContent - HTML内容
+     * @returns {Promise<string>|string} 图片宽度
+     */
     getImageWidth(htmlContent) {
       const img = this.getFirstImage(htmlContent);
       if (img) {
@@ -276,9 +354,20 @@ export default {
       }
       return '0px';
     },
+    /**
+     * 标签过滤方法
+     * @param {string} value - 过滤值
+     * @param {Object} row - 行数据
+     * @returns {boolean} 是否匹配
+     */
     filterTag(value, row) {
       return row.status === parseInt(value);
     },
+    /**
+     * 格式化审核状态
+     * @param {number} cellValue - 状态值
+     * @returns {string} 状态文本
+     */
     formatStatus(cellValue) {
       switch (cellValue) {
         case 0:
@@ -293,6 +382,11 @@ export default {
           return '未知状态';
       }
     },
+    /**
+     * 格式化提交记录状态
+     * @param {number} cellValue - 状态值
+     * @returns {string} 状态文本
+     */
     formatSubmitRecordStatus(cellValue) {
       switch (cellValue) {
         case 0:
@@ -307,14 +401,23 @@ export default {
           return '未知状态';
       }
     },
-    // 新增 cancel 方法
+    /**
+     * 取消操作
+     */
     cancel() {
       this.dialogVisible = false;
     },
-    // 新增 submitAudit 方法
+    /**
+     * 提交审核
+     */
     submitAudit() {
       // 此处可添加具体的提交审核逻辑，例如调用 API 进行审核操作
       console.log('执行提交审核操作');
+    /**
+     * 返回当前页的草稿数据
+     * 根据分页信息对完整数据进行切片
+     * @returns {Array} 当前页的草稿列表
+     */
     }
   },
   computed: {

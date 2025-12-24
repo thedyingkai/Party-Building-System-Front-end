@@ -1,20 +1,35 @@
+<!--
+  文章详情页面
+  
+  @component ArtiCle
+  @description 展示文章详细内容和评论区域
+  @author 党建系统开发团队
+-->
 <template>
 <el-container>
+  <!-- 顶部导航栏 -->
   <el-header class="background-head">
     <el-menu  mode="horizontal" class="background-head">
       <el-menu-item @click="goBack" style="font-size: 20px;color:#ffd700">返回</el-menu-item>
     </el-menu>
   </el-header>
+  
+  <!-- 主内容区域 -->
   <el-main class="background-main">
+    <!-- 文章标题 -->
     <el-col :span="20" :offset="2">
       <el-card class="markdown-body">
         <h1 style="text-align: center;justify-content: center;font-size: 40px">{{ article.title }}</h1>
       </el-card>
     </el-col>
+    
+    <!-- 文章内容 -->
     <el-col :span="20" :offset="2" style="margin-bottom: 10px">
       <el-card class="markdown-body" style="padding: 20px" v-html="article.content">
       </el-card>
     </el-col>
+    
+    <!-- 评论区域 -->
     <el-col :span="20" :offset="2" >
       <ComMents :articleid="this.id" @comments-loaded="scrollToHash" id="test" v-if="commentshow"></ComMents>
     </el-col>
@@ -31,26 +46,37 @@ import ComMents from "@/components/CommentList.vue";
 export default {
   name: "ArtiCle",
   components: {
-    ComMents
+    ComMents  // 评论列表组件
   },
   computed: {
 
   },
   data() {
     return {
+      // 文章ID
       id: 1,
+      // 文章数据对象，包含标题、内容等信息
       article: [],
-      commentshow:false
+      // 是否显示评论区域
+      commentshow: false
     };
   },
+  /**
+   * 组件创建时获取文章数据
+   * 从路由参数中提取文章ID并加载文章内容
+   */
   created() {
-    // 获取路由传递过来的参数
+    // 获取路由传递的文章ID参数
     const id = this.$route.params.id;
     this.id = Number(id);
+    // 获取文章详情
     this.getArticle();
     console.log(this.user);
   },
   watch: {
+    /**
+     * 监听路由变化，处理页面锚点滚动
+     */
     '$route'(to) {
       if (to.hash) {
         // 等待组件更新后执行滚动
@@ -61,6 +87,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * 滚动到页面锚点位置
+     * 根据URL的hash值滚动到对应的DOM元素
+     */
     scrollToHash() {
       const hash = this.$route.hash;
       if (hash) {
@@ -74,9 +104,16 @@ export default {
         }
       }
     },
+    /**
+     * 返回上一页
+     */
     goBack() {
       this.$router.go(-1);
     },
+    /**
+     * 获取文章详细信息
+     * 根据文章ID从后端获取文章内容并渲染
+     */
     getArticle() {
       this.loading = true; // 先将loading设置为true，表示正在加载数据
       let id = this.id;

@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component Exam_b
+ * @description 在线测试页面 - 展示指定试卷的题目,支持答题、评分和提交答题记录
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 在线测试容器 -->
   <div id="app" class="container">
     <!-- 题目标题 -->
     <div class="header">
@@ -164,6 +172,10 @@ import user from "@/views/exam/User.vue";
 
 export default {
   name: "Exam",
+  /**
+   * @description 组件数据
+   * @returns {Object} 包含试卷信息、题目列表、用户答案、当前索引、得分等
+   */
   data() {
     return {
       paper: {},
@@ -263,6 +275,10 @@ export default {
         }
       },
   methods: {
+    /**
+     * @description 获取格式化的当前日期时间
+     * @returns {String} 格式化的日期时间字符串 YYYY-MM-DD HH:mm:ss
+     */
     getFormattedDate() {
       const currentDate = new Date();
 
@@ -275,9 +291,15 @@ export default {
 
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // 返回格式化后的日期和时间
     },
+    /**
+     * @description 返回试卷列表页
+     */
     returnPapers() {
       this.$router.back()
     },
+    /**
+     * @description 根据题目顺序排序用户答案
+     */
     SortAnswer() {
       // 将 questions 和 userAnswers 合并成一个数组，包含了题目和对应的用户答案
       let combinedQuestions = this.questions.map((question, index) => {
@@ -293,6 +315,9 @@ export default {
       // 排序之后，将问题和答案分别提取出来，更新 questions 和 userAnswers
       this.userAnswers = combinedQuestions.map(item => item.answer);
     },
+    /**
+     * @description 更新用户答案数组,根据题型初始化不同的答案格式
+     */
     updateAnswer() {
       this.userAnswers = this.questions.map((question) => {
         if (question.type === 'single') {
@@ -304,19 +329,25 @@ export default {
         }
       });
     },
-    // 上一题
+    /**
+     * @description 切换到上一题
+     */
     prevQuestion() {
       if (this.currentIndex > 0) {
         this.currentIndex -= 1;
       }
     },
-    // 下一题
+    /**
+     * @description 切换到下一题
+     */
     nextQuestion() {
       if (this.currentIndex < this.questions.length - 1) {
         this.currentIndex += 1;
       }
     },
-    // 提交答案
+    /**
+     * @description 提交答案,保存答题记录到服务器并计算得分
+     */
     submitAnswers() {
 
       // 拼接答案
@@ -330,7 +361,9 @@ export default {
       this.calculateScore();
     },
 
-    // 计算得分
+    /**
+     * @description 计算得分,每题10分
+     */
     calculateScore() {
       this.score = 0;
       console.log(this.questions.length)

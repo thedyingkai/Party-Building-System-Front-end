@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component BranchManager
+ * @description 支部委员管理页面 - 管理支部委员职务和任职人员
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 支部委员管理容器 -->
   <el-container style="margin: 40px;border: solid crimson;width: 80vw;min-height: 65vh">
     <el-header style="margin: 20px;width: 80vw;">
       <el-button  @click="routereturn">返回</el-button>
@@ -139,15 +147,22 @@ export default {
   props: {},
   data() {
     return {
+      /** 当前支部ID */
       bid: null,
+      /** 增设职务对话框显示状态 */
       dialogVisible: false,
+      /** 调整任职人员对话框显示状态 */
       changeManagerDialogVisible: false,
+      /** 支部委员列表 */
       branch_managers: [],
+      /** 支部用户列表 */
       branch_users: [],
+      /** 新增的委员信息数组 */
       newManagers: [{
         uid: '',
         name: ''
-      }], // 改为数组形式
+      }],
+      /** 可选的职务列表 */
       possibleManager: [
         {value: 0, label: '支部书记'},
         {value: 1, label: '支部副书记'},
@@ -156,10 +171,13 @@ export default {
         {value: 4, label: '保密委员'},
         {value: 5, label: '青年委员'},
         {value: 6, label: '纪检委员'}],
+      /** 表单验证规则 */
       rules: {
         name: [{required: true, message: '请选择人员', trigger: 'blur'}]
       },
+      /** 当前编辑的委员ID */
       currentManagerId: null,
+      /** 新任职人员的用户ID */
       newManagerUid: ''
     }
   },
@@ -169,6 +187,11 @@ export default {
     this.getBranch_manager(this.bid);
   },
   methods: {
+    /**
+     * 获取支部委员列表
+     * 从服务器加载指定支部的所有委员信息
+     * @param {number} id - 支部ID
+     */
     async getBranch_manager(id) {
       try {
         const res = await this.$request.get(`/branch_manager/selectByBid/${id}`);
@@ -179,6 +202,11 @@ export default {
         console.error('数据加载出错', error);
       }
     },
+    /**
+     * 获取支部用户列表
+     * 从服务器加载指定支部的所有用户
+     * @param {number} id - 支部ID
+     */
     async getBranch_user(id) {
       try {
         const res = await this.$request.get(`/user/selectByBranch/${id}`);
@@ -189,6 +217,10 @@ export default {
         console.error('数据加载出错', error);
       }
     },
+    /**
+     * 打开增设职务对话框
+     * 初始化表单数据并加载支部用户列表
+     */
     editCommittee() {
       this.newManagers = [{
         uid: '',
@@ -198,12 +230,25 @@ export default {
       this.getBranch_user(this.bid);
       this.dialogVisible = true;
     },
+    /**
+     * 添加职务表单项
+     * 在表单中增加一个新的职务输入项
+     */
     addManager() {
       this.newManagers.push({uid: '', name: '', bid: this.bid})
     },
+    /**
+     * 移除职务表单项
+     * 从表单中删除指定索引的职务输入项
+     * @param {number} index - 要删除的表单项索引
+     */
     removeManager(index) {
       this.newManagers.splice(index, 1)
     },
+    /**
+     * 提交新增委员
+     * 验证表单数据并批量添加委员到服务器
+     */
     async subManager() {
       // 提交前验证
       const isValid = this.newManagers.every(item => {
@@ -228,6 +273,11 @@ export default {
         this.$message.error('操作失败，请检查数据');
       }
     },
+    /**
+     * 删除委员职务
+     * 弹出确认框后删除指定的委员职务
+     * @param {number} id - 委员职务ID
+     */
     deleteManager(id) {
       MessageBox.confirm('确定删除？', '删除委员', {
         confirmButtonText: '确定',
@@ -247,14 +297,27 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 返回上一页
+     * 使用路由导航返回到上一个页面
+     */
     routereturn() {
       this.$router.back();
     },
+    /**
+     * 打开调整任职人员对话框
+     * 设置当前编辑的委员ID并加载支部用户列表
+     * @param {number} id - 委员职务ID
+     */
     changeManager(id) {
       this.currentManagerId = id;
       this.getBranch_user(this.bid);
       this.changeManagerDialogVisible = true;
     },
+    /**
+     * 提交任职人员调整
+     * 验证后更换指定职务的任职人员
+     */
     async submitChangeManager() {
       if (!this.newManagerUid) {
         this.$message.error('请选择新的任职人员');

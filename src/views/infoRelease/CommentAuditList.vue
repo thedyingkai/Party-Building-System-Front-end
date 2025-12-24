@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component CommentAuditList
+ * @description 评论审核列表页面 - 审核人员处理待审核的用户评论
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 评论审核列表容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-table :data="returntable.filter(data =>!search || (data.title?.toLowerCase()?.includes(search.toLowerCase()))
     || (data.uid?.toLowerCase()?.includes(search.toLowerCase()))
@@ -75,34 +83,50 @@ export default {
   components: {CommentView, AuditForm},
   data() {
     return {
+      /** 当前登录用户信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 待审核评论列表数据 */
       tableData: [],
+      /** 搜索关键字 */
       search: '',
+      /** 加载状态 */
       loading: true,
+      /** 当前预览的评论草稿 */
       draft: {
         id: '',
         title: '',
         content: '',
       },
+      /** 评论审核提交对象 */
       comments: {
-        id: 1,
-        title: '',
-        uid: 1,
-        content: '',
-        send_time: '',
-        audit_uid: 1,
-        status: 0,
+        id: 1,           // 评论ID
+        title: '',       // 文章标题
+        uid: 1,          // 用户ID
+        content: '',     // 评论内容
+        send_time: '',   // 提交时间
+        audit_uid: 1,    // 审核员ID
+        status: 0,       // 审核状态
       },
+      /** 审核对话框显示状态 */
       dialogVisible: false,
-      currentPage: 1, // 当前页码
-      total: 0, // 总数据量
+      /** 当前页码 */
+      currentPage: 1,
+      /** 总记录数 */
+      total: 0,
+      /** 每页显示数量 */
       pageSize: 5,
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载后加载待审核评论列表
+   */
   mounted() {
     this.loadData();
   },
   methods: {
+    /**
+     * 加载待审核的评论列表
+     */
     loadData() {
       this.loading = true;
       this.$request.get('/comment/selectallnopass').then(
@@ -118,31 +142,63 @@ export default {
         this.loading = false;
       });
     },
+    /**
+     * 处理每页条数变化
+     * @param {number} newSize - 新的每页条数
+     */
     handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
+    /**
+     * 处理页码变化
+     * @param {number} newPage - 新的页码
+     */
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
       this.fetchData();
     },
+    /**
+     * 移除HTML标签
+     * @param {string} html - HTML内容
+     * @returns {string} 纯文本
+     */
     stripHtmlTags(html) {
       let tmp = document.createElement("DIV");
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText;
     },
+    /**
+     * 审核评论
+     * @param {number} index - 索引
+     * @param {Object} row - 评论数据
+     */
     audit(index, row) {
       this.draft.id = row.id;
       this.draft.title = row.title;
       this.draft.content = row.content;
       this.dialogVisible = true;
     },
+    /**
+     * 删除记录
+     * @param {number} index - 索引
+     * @param {Object} row - 数据
+     */
     handleDelete(index, row) {
       console.log(index, row);
     },
+    /**
+     * 处理输入事件
+     * @param {Event} event - 输入事件
+     */
     handleInput(event) {
       console.log(event);
     },
+    /**
+     * 获取第一张图片
+     * @param {string} htmlContent - HTML内容
+     * @returns {string|null} 图片URL
+     */
     getFirstImage(htmlContent) {
       if (htmlContent) {
         let tmp = document.createElement("DIV");
@@ -154,6 +210,11 @@ export default {
       }
       return null;
     },
+    /**
+     * 获取图片宽度
+     * @param {string} htmlContent - HTML内容
+     * @returns {Promise|string} 图片宽度
+     */
     getImageWidth(htmlContent) {
       const img = this.getFirstImage(htmlContent);
       if (img) {
@@ -171,6 +232,9 @@ export default {
       }
       return '0px';
     },
+    /**
+     * 提交审核结果
+     */
     submitAudit() {
       const auditForm = this.$refs.auditFormRef;
       const formData = auditForm.getFormData();
@@ -191,6 +255,9 @@ export default {
       );
       this.dialogVisible = false;
     },
+    /**
+     * 取消审核
+     */
     cancel() {
       this.$request.put('/draft/unlock/' + this.draft.id).then(
           res => {
@@ -207,6 +274,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * 返回当前页的评论数据
+     * @returns {Array} 分页后的评论列表
+     */
     returntable() {
       return this.tableData.slice(this.pageSize * (this.currentPage - 1), this.pageSize * this.currentPage);
     }

@@ -1,3 +1,10 @@
+<!--
+/**
+ * @component choose_new
+ * @description 智能组卷系统 - 支持多种组卷策略(智能配题/随机组卷/关键词组卷),允许配置题型数量、积分奖励和时间范围
+ * @author Party Building System
+ */
+-->
 <script>
 export default {
   name: "Choose"
@@ -5,6 +12,7 @@ export default {
 </script>
 
 <template>
+  <!-- 智能组卷容器 -->
   <div class="enterprise-container">
     <el-card class="form-card" shadow="never">
       <div class="card-header">
@@ -13,7 +21,7 @@ export default {
       </div>
 
       <el-form ref="form" :model="form" label-position="top" class="compact-form">
-        <!-- 模式选择 -->
+        <!-- 组卷策略选择区域 -->
         <div class="form-section">
           <h3 class="section-title"><i class="el-icon-s-operation"></i> 组卷策略</h3>
           <el-radio-group v-model="form.mode" class="strategy-radio">
@@ -130,6 +138,10 @@ import request from "@/utils/request";
 
 export default {
   name: "ExamComposer",
+  /**
+   * @description 组件数据
+   * @returns {Object} 包含表单数据、题目数据、关键词数据等
+   */
   data() {
     return {
       // 表单数据
@@ -276,7 +288,9 @@ export default {
     }
   },
   methods: {
-    //
+    /**
+     * @description 验证题目数量是否超出题库容量
+     */
     handlequestionnumber()
     {
       if(this.form.mode==='byCategory')
@@ -308,29 +322,44 @@ export default {
       }
 
     },
-    // 切换模式时重置相关选项
+    /**
+     * @description 切换模式时重置相关选项
+     */
     handleModeChange() {
       if (this.form.mode === "random") {
         this.form.categories = []; // 清空栏目选择
       }
     },
+    /**
+     * @description 关键词改变时的处理函数，重新获取相关题库
+     */
     handlechange() {
       this.test1()
       this.fetchgetflexmc()
       this.fetchgetflextf()
       this.fetchgetflexfi()
     },
+    /**
+     * @description 测试函数，输出当前关键词
+     */
     test1() {
       console.log(this.form.keyword);
     },
 
+    /**
+     * @description 格式化日期时间字符串，将ISO格式转换为数据库格式
+     * @param {String} datetime - ISO格式的日期时间字符串
+     * @returns {String} 格式化后的日期时间字符串
+     */
     formatDatetime(datetime) {
       // 检查是否存在值
       if (!datetime) return '';
       // 替换 'T' 为 ' ' 并补充秒数 ':00'
       return datetime.replace('T', ' ') + ':00';
     },
-    //获取填空题数据
+    /**
+     * @description 获取填空题数据
+     */
     fetchgetfi() {
       request.get("/questions/fi") // 后台接口路径
           .then((response) => {
@@ -343,7 +372,9 @@ export default {
             console.error("获取填空题失败:", error);
           });
     },
-    //获取判断题数据
+    /**
+     * @description 获取判断题数据
+     */
     fetchgettf() {
       request.get("/questions/tf") // 后台接口路径
           .then((response) => {
@@ -356,7 +387,9 @@ export default {
             console.error("获取判断题失败:", error);
           });
     },
-    //获取选择题数据
+    /**
+     * @description 获取选择题数据
+     */
     fetchgetchoice() {
       request.get("/questions/mc") // 后台接口路径
           .then((response) => {
@@ -370,7 +403,9 @@ export default {
             console.error("获取选择题失败:", error);
           });
     },
-    //获取满足关键词选择题数据
+    /**
+     * @description 根据关键词获取选择题数据
+     */
     fetchgetflexmc() {
       request.get("/questions/mc/search/keyword/" + this.form.keyword) // 后台接口路径
           .then((response) => {
@@ -384,7 +419,9 @@ export default {
             console.error("获取关键词选择题失败:", error);
           });
     },
-    //获取满足关键词判断题数据
+    /**
+     * @description 根据关键词获取判断题数据
+     */
     fetchgetflextf() {
       request.get("/questions/tf/search/keyword/" + this.form.keyword) // 后台接口路径
           .then((response) => {
@@ -397,7 +434,9 @@ export default {
             console.error("获取关键词判断题失败:", error);
           });
     },
-    //获取满足关键词填空题数据
+    /**
+     * @description 根据关键词获取填空题数据
+     */
     fetchgetflexfi() {
       request.get("/questions/fi/search/keyword/" + this.form.keyword) // 后台接口路径
           .then((response) => {
@@ -410,7 +449,9 @@ export default {
             console.error("获取关键词填空题失败:", error);
           });
     },
-    //获取现有试卷数据
+    /**
+     * @description 获取现有试卷数据,并生成新的试卷ID
+     */
     fetchgetid() {
       request.get("/papers") // 后台接口路径
           .then((response) => {
@@ -430,7 +471,9 @@ export default {
             console.error("获取试卷失败:", error);
           });
     },
-    // 获取关键词数据
+    /**
+     * @description 获取关键词数据
+     */
     fetchCategories() {
       request.get("/keywords") // 假设后台接口路径为 /api/getCategories
           .then((response) => {
@@ -444,6 +487,10 @@ export default {
           });
 
     },
+    /**
+     * @description 随机获取选择题题号
+     * @param {Number} count - 需要随机选择的题目数量
+     */
     randomcmid(count) {
       //随机获得选择题号
       this.getchid();
@@ -462,6 +509,10 @@ export default {
       console.log(this.choicequestion.selectids);
       this.cmsubmit(count);
     },
+    /**
+     * @description 随机获取判断题题号
+     * @param {Number} count - 需要随机选择的题目数量
+     */
     randomtfid(count) {
       //随机获得判断题号
       this.gettfid();
@@ -481,6 +532,10 @@ export default {
       this.tfsubmit(count);
 
     },
+    /**
+     * @description 随机获取填空题题号
+     * @param {Number} count - 需要随机选择的题目数量
+     */
     randomfiid(count) {
       //随机获得填空题号
       this.getfiid();
@@ -500,6 +555,10 @@ export default {
       this.fisubmit(count);
 
     },
+    /**
+     * @description 根据关键词随机获取选择题题号
+     * @param {Number} count - 需要随机选择的题目数量
+     */
     flexrandomcmid(count) {
       //随机获得选择题号
       this.getflchid();
@@ -518,6 +577,10 @@ export default {
       console.log(this.flexmcquestion.selectids);
       this.flexcmsubmit(count);
     },
+    /**
+     * @description 根据关键词随机获取判断题题号
+     * @param {Number} count - 需要随机选择的题目数量
+     */
     flexrandomtfid(count) {
       //随机获得判断题号
       this.getfltfid();
@@ -537,6 +600,10 @@ export default {
       this.flextfsubmit(count);
 
     },
+    /**
+     * @description 根据关键词随机获取填空题题号
+     * @param {Number} count - 需要随机选择的题目数量
+     */
     flexrandomfiid(count) {
       //随机获得填空题号
       this.getflfiid();
@@ -556,37 +623,53 @@ export default {
       this.flexfisubmit(count);
 
     },
+    /**
+     * @description 提取选择题的所有ID
+     */
     getchid() {
       const existingIds = this.choicequestion.all.map(category => category.multiple_choice_question_id);
       this.choicequestion.cmid = existingIds;
     },
-    //获取选择题题目id
+    /**
+     * @description 提取判断题的所有ID
+     */
     gettfid() {
       const existingIds = this.tfquestion.all.map(category => category.true_false_question_id);
       this.tfquestion.tfid = existingIds;
     },
-    //获取题目id
+    /**
+     * @description 提取填空题的所有ID
+     */
     getfiid() {
       const existingIds = this.fiquestion.all.map(category => category.fill_in_the_blank_question_id);
       this.fiquestion.fiid = existingIds;
       console.log(this.fiquestion.fiid);
     },
+    /**
+     * @description 提取关键词选择题的所有ID
+     */
     getflchid() {
       const existingIds = this.flexmcquestion.all.map(category => category.multiple_choice_question_id);
       this.flexmcquestion.cmid = existingIds;
     },
-    //获取题目id
+    /**
+     * @description 提取关键词判断题的所有ID
+     */
     getfltfid() {
       const existingIds = this.flextfquestion.all.map(category => category.true_false_question_id);
       this.flextfquestion.tfid = existingIds;
     },
-    //获取题目id
+    /**
+     * @description 提取关键词填空题的所有ID
+     */
     getflfiid() {
       const existingIds = this.flexfiquestion.all.map(category => category.fill_in_the_blank_question_id);
       this.flexfiquestion.fiid = existingIds;
       console.log(this.flexfiquestion.fiid);
     },
-    // 提交表单
+    /**
+     * @description 提交表单,创建试卷并跳转到试卷列表页
+     */
     handleSubmit() {
       if (
           // (this.form.mode === "byCategory" && this.form.categories.length === 0) ||
@@ -619,17 +702,26 @@ export default {
             console.error("提交失败:", error);
           });
     },
+    /**
+     * @description 执行随机组卷流程
+     */
     submit() {
       this.randomcmid(this.form.choiceCount);//随机选择选择题号并提交
       this.randomtfid(this.form.judgmentCount);//随机选择判断题号并提交
       this.randomfiid(this.form.fillBlankCount);//随机选择填空题号并提交
     },
+    /**
+     * @description 执行关键词组卷流程
+     */
     fsubmit() {//关键词题号
       this.flexrandomcmid(this.form.choiceCount);//随机选择选择题号并提交
       this.flexrandomtfid(this.form.judgmentCount);//随机选择判断题号并提交
       this.flexrandomfiid(this.form.fillBlankCount);//随机选择填空题号并提交
     },
-    //提交选择题题号
+    /**
+     * @description 批量提交选择题到试卷
+     * @param {Number} count - 选择题数量
+     */
     cmsubmit(count) {
       let temple;
       let i;
@@ -652,6 +744,10 @@ export default {
             });
       }
     },
+    /**
+     * @description 批量提交判断题到试卷
+     * @param {Number} count - 判断题数量
+     */
     tfsubmit(count) {
       let temple;
       let i;
@@ -674,6 +770,10 @@ export default {
             });
       }
     },
+    /**
+     * @description 批量提交填空题到试卷
+     * @param {Number} count - 填空题数量
+     */
     fisubmit(count) {
       let temple;
       let i;
@@ -696,7 +796,10 @@ export default {
             });
       }
     },
-    //提交关键词选择题题号
+    /**
+     * @description 批量提交关键词选择题到试卷
+     * @param {Number} count - 选择题数量
+     */
     flexcmsubmit(count) {
       let temple;
       let i;
@@ -719,6 +822,10 @@ export default {
             });
       }
     },
+    /**
+     * @description 批量提交关键词判断题到试卷
+     * @param {Number} count - 判断题数量
+     */
     flextfsubmit(count) {
       let temple;
       let i;
@@ -741,6 +848,10 @@ export default {
             });
       }
     },
+    /**
+     * @description 批量提交关键词填空题到试卷
+     * @param {Number} count - 填空题数量
+     */
     flexfisubmit(count) {
       let temple;
       let i;

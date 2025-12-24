@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component SectorManage
+ * @description 部门管理页面 - 支持部门增删改、人员分配和移动
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 部门管理容器 -->
   <div class="el-container" style="justify-content: space-around; align-items: center;">
     <div class="column-container">
       <div class="column-container-header">
@@ -110,36 +118,59 @@ export default {
 
   data() {
     return {
+      /** 当前登录用户信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
-      fromColumnId:'',
-      dialogVisible_move:false,
-      de_name:'未分类',
-      se_id:0,
-      de_id:-1,
-      remove_uid:0,
+      /** 目标移动栏目ID */
+      fromColumnId: '',
+      /** 人员移动对话框显示状态 */
+      dialogVisible_move: false,
+      /** 当前展示的科室名称 */
+      de_name: '未分类',
+      /** 当前选中的部门ID */
+      se_id: 0,
+      /** 当前选中的科室ID */
+      de_id: -1,
+      /** 要移除的用户ID */
+      remove_uid: 0,
+      /** 总记录数 */
       total: 0,
+      /** 新增部门对象 */
       newSector: {
         name: '',
       },
+      /** 新增科室对象 */
       newDepartment: {
         name: '',
-        seid: -1,
+        seid: -1,  // 所属部门ID
       },
+      /** 活动列表（备用） */
       activities: [],
+      /** 部门树形结构数据 */
       sectors: [],
-      users:[],
+      /** 当前科室的用户列表 */
+      users: [],
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载时加载部门和未分类用户
+   */
   mounted() {
     this.fetchData();
     this.fetchUser(this.de_id);
   },
   methods: {
+    /**
+     * 显示移动对话框
+     * @param {number} id - 用户ID
+     */
     showdialog(id){
       this.remove_uid=id;
       console.log(this.remove_uid);
       this.dialogVisible_move=true;
     },
+    /**
+     * 移动用户到指定部门
+     */
     moveUser(){
       console.log(this.fromColumnId);
       let user1 = {
@@ -157,6 +188,9 @@ export default {
           }
       )
     },
+    /**
+     * 获取部门数据
+     */
     fetchData() {
       this.$request.get('/sector/selectAll').then(
           res => {
@@ -174,6 +208,10 @@ export default {
         console.error('数据加载出现错误:', error);
       });
     },
+    /**
+     * 获取指定部门的用户列表
+     * @param {number} id - 部门ID
+     */
     fetchUser(id){
       console.log(id);
       this.$request.get('/user/selectByDeid/'+id).then(
@@ -189,11 +227,19 @@ export default {
       });
 
     },
+    /**
+     * 返回默认未分类视图
+     */
     returndefault(){
       this.de_id=-1;
       this.de_name="未分类";
       this.fetchUser(this.de_id);
     },
+    /**
+     * 处理节点点击事件
+     * @param {Object} data - 节点数据
+     * @param {Object} node - 节点对象
+     */
     handleNodeClick(data, node) {
       // 判断节点是否为子节点
       if (!node.childNodes.length) {
@@ -206,11 +252,22 @@ export default {
         // 这里可以进一步处理子节点被点击的逻辑
       }
     },
+    /**
+     * 切换活动
+     * @param {Object} item - 活动项
+     */
+    /**
+     * 切换活动（预留方法）
+     * @param {Object} item - 活动对象
+     */
     changeac(item) {
       this.ac_title = item.name;
       this.ac_id = item.id;
       console.log(item);
     },
+    /**
+     * 添加部门
+     */
     addSector() {
       // 弹出对话框添加根节点
       MessageBox.prompt('请输入新部门名称', '添加部门', {
@@ -228,6 +285,10 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 添加科室
+     * @param {number} id - 所属部门ID
+     */
     addDepartment(id) {
       // 弹出对话框添加根节点
       MessageBox.prompt('请输入新科室名称', '添加科室', {
@@ -247,6 +308,10 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 重命名部门
+     * @param {number} id - 部门ID
+     */
     renamese(id) {
       // 弹出对话框编辑节点
       MessageBox.prompt('请输入新名称', '编辑部门名称', {
@@ -271,6 +336,10 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 重命名科室
+     * @param {number} id - 科室ID
+     */
     renamede(id) {
       // 弹出对话框编辑节点
       MessageBox.prompt('请输入新名称', '编辑科室名称', {
@@ -295,6 +364,10 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 删除部门
+     * @param {number} id - 部门ID
+     */
     deletese(id) {
       MessageBox.confirm('确定删除该部门？部门下的科室将一起被删除', '删除部门', {
         confirmButtonText: '确定',
@@ -315,6 +388,10 @@ export default {
       }).catch(() => {
       });
     },
+    /**
+     * 删除科室
+     * @param {number} id - 科室ID
+     */
     deletede(id) {
       MessageBox.confirm('确定删除该科室？', '删除科室', {
         confirmButtonText: '确定',

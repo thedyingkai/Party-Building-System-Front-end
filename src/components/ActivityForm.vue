@@ -1,6 +1,15 @@
+<!--
+  党建活动表单组件
+  
+  @component ActivityForm
+  @description 用于创建和编辑党建活动的表单组件，支持活动信息填写、缺勤人员管理和富文本内容编辑
+  @author 党建系统开发团队
+-->
 <template>
+  <!-- 活动表单主体 -->
   <el-form ref="activityForm" :model="activityForm" :rules="rules" class="demo-activityForm" label-width="100px"
            style="width: 100%">
+    <!-- 活动名称输入 -->
     <el-form-item label="活动名称" prop="name" >
       <el-input v-model="activityForm.name"></el-input>
     </el-form-item>
@@ -86,10 +95,30 @@ import E from "wangeditor";
 export default {
   name: "ActivityForm",
   props: {
+    /**
+     * 活动类型列表
+     * @type {Array}
+     */
     activityTypes: {type: Array},
+    /**
+     * 党小组ID
+     * @type {Number}
+     */
     gid: {type: Number},
+    /**
+     * 编辑模式下的原始数据
+     * @type {Object}
+     */
     oldData: {type: Object, default: () => ({})},
+    /**
+     * 是否为新增模式
+     * @type {Boolean}
+     */
     addType: {type: Boolean, default: true},
+    /**
+     * 对话框标题
+     * @type {String}
+     */
     dialogTitle: {type: String, default: '新增活动'}
   },
   created() {
@@ -147,6 +176,12 @@ export default {
     this.initWangEditor()
   },
   methods: {
+    /**
+     * 查询党小组成员列表
+     * 
+     * @param {Number} gid - 党小组ID
+     * @description 获取党小组所有成员，并初始化缺勤状态
+     */
     selectUsers(gid) {
       this.$request.get('/user/selectBranchByGid/' + gid).then(
           res => {
@@ -169,6 +204,12 @@ export default {
         console.error('党支部成员数据加载出错', error);
       })
     },
+    /**
+     * 提交表单
+     * 
+     * @param {String} formName - 表单引用名称
+     * @description 验证表单后提交，根据 addType 决定是新增还是更新
+     */
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
@@ -205,6 +246,12 @@ export default {
         }
       });
     },
+    /**
+     * 重置表单
+     * 
+     * @param {String} formName - 表单引用名称
+     * @description 重置所有表单字段和缺勤信息
+     */
     resetForm(formName) {
       this.$refs[formName].resetFields();
       this.activityForm.members.forEach(member => {
@@ -214,6 +261,12 @@ export default {
       });
       this.selectedIds = [];
     },
+    /**
+     * 处理缺勤人员变化
+     * 
+     * @param {Array} selectedIds - 选中的缺勤人员ID数组
+     * @description 更新成员的缺勤状态
+     */
     handleAbsenceChange(selectedIds) {
       this.selectedIds = selectedIds;
       this.activityForm.members.forEach(member => {
@@ -224,6 +277,12 @@ export default {
         }
       });
     },
+    /**
+     * 移除单个缺勤记录
+     * 
+     * @param {Object} member - 要移除缺勤的成员对象
+     * @description 清除成员的缺勤标记和相关信息
+     */
     removeAbsence(member) {
       member.isAbsent = false;
       member.type = null;
@@ -233,7 +292,11 @@ export default {
         this.selectedIds.splice(idIndex, 1);
       }
     },
-    // 富文本编辑器初始化
+    /**
+     * 初始化富文本编辑器
+     * 
+     * @description 创建 WangEditor 实例并配置图片上传功能
+     */
     initWangEditor() {
       setTimeout(() => {
         if (!this.editor) {

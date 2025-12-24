@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component EditorPage
+ * @description 文章编辑器页面 - 使用WangEditor富文本编辑器,支持草稿保存和提交审核
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 文章编辑器容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;">
     <el-menu class="draft-menu" mode="horizontal">
       <div style="float: left;color: #fbfbfb">
@@ -95,7 +103,13 @@ export default {
     this.initWangEditor(this.draft.content);
   },
   methods: {
-    //根据id查找对象
+    /**
+     * 根据ID在树形结构中查找节点
+     * 递归查找包括子节点
+     * @param {Array} data - 树形数据结构
+     * @param {number} targetId - 目标节点ID
+     * @returns {Object|null} 找到的节点对象或null
+     */
     findById(data, targetId) {
       for (const item of data) {
         if (item.id === targetId) {
@@ -107,14 +121,23 @@ export default {
         }
       }
       return null; // 如果未找到，返回 null
-    },
-    goBack() {
+    },    /**
+     * 返回上一页
+     */    goBack() {
       this.$router.go(-1);
     },
+    /**
+     * 预览草稿
+     * 获取编辑器内容并显示预览对话框
+     */
     preview() {
       this.draft.content = this.editor.txt.html()
       this.dialogVisible = true;
     },
+    /**
+     * 获取编辑器内容
+     * 将富文本编辑器的HTML内容保存到draft对象
+     */
     getContent() {
       // 获取编辑框内容
       this.draft.content = this.editor.txt.html()
@@ -146,6 +169,10 @@ export default {
         }
       })
     },
+    /**
+     * 提交草稿审核
+     * 验证表单并提交草稿进入审核流程
+     */
     submit() {
       let column=this.findById(this.options, this.draft.coid[this.draft.coid.length - 1]);
       console.log("cplumn");
@@ -185,6 +212,11 @@ export default {
         }
       })
     },
+    /**
+     * 处理服务器响应
+     * @param {Object} res - 服务器响应对象
+     * @param {Function} successCallback - 成功时的回调函数
+     */
     handleResponse(res, successCallback) {
       if (res.code === '200') {
         successCallback();
@@ -193,7 +225,12 @@ export default {
         this.$message.error(res.data.msg);
       }
     },
-    // 转换 options 数据结构，并移除 child 为空的项
+    /**
+     * 转换栏目数据结构
+     * 将栏目数据转换为Cascader组件所需的格式
+     * @param {Array} options - 原始栏目数据
+     * @returns {Array} 转换后的数据结构
+     */
     transformOptions(options) {
       return options.map(item => {
         let newItem = {
@@ -207,7 +244,11 @@ export default {
       });
     },
 
-    // 富文本编辑器初始化
+    /**
+     * 富文本编辑器初始化
+     * 初始化WangEditor并设置图片上传配置
+     * @param {string} content - 初始化的内容
+     */
     initWangEditor(content) {
       setTimeout(() => {
         if (!this.editor) {

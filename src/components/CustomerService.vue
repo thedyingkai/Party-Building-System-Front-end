@@ -1,14 +1,22 @@
+<!--
+  AI 智能客服组件
+  
+  @component CustomerService
+  @description 智能客服聊天界面，支持流式响应和 Markdown 渲染
+  @author 党建系统开发团队
+-->
 <template>
   <div style="height: 100%">
-    <!--    <div class="title">-->
-    <!--      <span style="color: red;">AI</span>智能客服为您服务-->
-    <!--    </div>-->
+    <!-- 对话内容区域 -->
     <div class="content">
       <template v-for="item in data">
+        <!-- 用户提问 -->
         <question-item v-if="item.question !== ''" :value="item.question"/>
+        <!-- AI 回答 -->
         <answer-item v-if="item.answer !== ''" :value="item.answer"/>
       </template>
     </div>
+    <!-- 输入区域 -->
     <div class="textarea-container">
       <el-input v-model="questionInputValue" :rows="6" class="custom-textarea" placeholder="请输入内容" resize='none'
                 type="textarea"></el-input>
@@ -38,6 +46,11 @@ export default {
     }
   },
   methods: {
+    /**
+     * 提交问题并获取 AI 回答
+     * 
+     * @description 发送用户问题到后端，以流式方式接收 AI 回答
+     */
     async handleSubmit() {
       // 处理提交逻辑
       console.log('提交的内容:', this.questionInputValue);

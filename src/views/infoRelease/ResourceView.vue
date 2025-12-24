@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component ResourceView
+ * @description 资源管理页面 - 展示活动资源、资源统计图表、支持资源上传和筛选
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 资源管理容器 -->
   <div class="flex-col flex-1 section_3">
     <div class="flex-row group">
       <div class="flex-col shrink-0 section_4">
@@ -138,6 +146,9 @@ export default {
       debounceTimer: null,
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载时加载数据
+   */
   mounted() {
     this.fetchLatestImages();
     this.countResource();
@@ -145,7 +156,12 @@ export default {
     this.fetchUser();       // 新增：加载用户数据
     this.fetchActivities(); // 新增：加载活动数据
   },
-  watch: { // 新增监听器
+  watch: {
+    /**
+     * 监听资源筛选关键字变化
+     * 当筛选类型为'活动参与者'时进行防抖处理
+     * @param {string} newVal - 新的关键字
+     */
     filterTextForResources(newVal) {
       if (this.selectedFilter === 'joiner') {
         // 防抖处理：300ms 内无新输入才执行
@@ -155,6 +171,11 @@ export default {
         }, 300);
       }
     },
+    /**
+     * 监听筛选类型变化
+     * 当切换到'活动参与者'筛选时立即触发查询
+     * @param {string} newVal - 新的筛选类型
+     */
     selectedFilter(newVal) {
       if (newVal === 'joiner') {
         // 切换筛选类型时立即触发（可选）
@@ -217,6 +238,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * 根据活动参与者获取资源
+     * @param {string} keyword - 参与者关键字
+     */
     async fetchResourcesByJoiner(keyword) {
       try {
         const res = await this.$request.get('/resource/selectByJoiner', {
@@ -232,6 +257,10 @@ export default {
         console.error('活动参与者资源加载失败', error);
       }
     },
+    /**
+     * 获取最新图片
+     * 加载轮播图所需的最新活动图片
+     */
     fetchLatestImages() {
       this.$request.get('/resource/selectLatestImages').then(
           res => {
@@ -245,10 +274,16 @@ export default {
         console.error('资源加载失败', error);
       })
     },
+    /**
+     * 统计资源数据
+     */
     countResource() {
       this.countByType();
       this.countByActivityDate();
     },
+    /**
+     * 按类型统计资源
+     */
     countByType() {
       this.$request.get('/resource/count').then(
           res => {
@@ -263,6 +298,9 @@ export default {
         console.error('资源加载失败', error);
       })
     },
+    /**
+     * 按活动日期统计资源
+     */
     countByActivityDate() {
       this.$request.get('/resource/countEachMonth').then(
           res => {
@@ -297,6 +335,10 @@ export default {
         console.error('资源加载失败', error);
       })
     },
+    /**
+     * 获取用户列表
+     * 构建ID到姓名的映射
+     */
     fetchUser() {
       this.$request.get('/user/selectAll').then(res => {
         if (res.code === '200') {
@@ -310,6 +352,10 @@ export default {
         console.error('用户数据加载失败', error);
       });
     },
+    /**
+     * 获取活动列表
+     * 构建ID到活动名的映射
+     */
     fetchActivities() {
       this.$request.get('/activity/selectAll').then(res => {
         if (res.code === '200') {
@@ -323,6 +369,9 @@ export default {
         console.error('活动数据加载失败', error);
       });
     },
+    /**
+     * 获取所有资源
+     */
     fetchResources() {
       this.$request.get('/resource/selectAll').then(
           res => {
@@ -337,6 +386,10 @@ export default {
         console.error('资源加载失败', error);
       })
     },
+    /**
+     * 按类型筛选资源
+     * @param {number} documentType - 文档类型(0表示全部)
+     */
     filterType(documentType) {
       if (documentType === 0) {
         this.filterResources = this.resources;

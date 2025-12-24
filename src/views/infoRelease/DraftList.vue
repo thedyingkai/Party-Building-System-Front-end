@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component DraftList
+ * @description 草稿箱页面 - 展示用户的草稿列表,支持编辑、删除和搜索
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 草稿列表容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-table :data="returntable.filter(data =>!search || (data.title?.toLowerCase()?.includes(search.toLowerCase()))
                                                        || (data.content?.toLowerCase()?.includes(search.toLowerCase())))"
@@ -91,15 +99,30 @@ export default {
     console.log(this.user);
   },
   methods: {
+    /**
+     * 打开新增活动对话框
+     */
     addActivity() {
       this.dialogTitle = '新增活动';
       this.dialogVisible_add = true;
     },
+    /**
+     * 移除HTML标签
+     * 将HTML内容转换为纯文本
+     * @param {string} html - HTML内容
+     * @returns {string} 纯文本内容
+     */
     stripHtmlTags(html) {
       let tmp = document.createElement("DIV");
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText;
     },
+    /**
+     * 编辑草稿
+     * 跳转到草稿编辑页面
+     * @param {number} index - 表格索引
+     * @param {Object} row - 草稿数据对象
+     */
     handleEdit(index, row) {
       this.$router.push({
         name: '草稿编辑',
@@ -112,6 +135,11 @@ export default {
         }
       });
     },
+    /**
+     * 删除草稿
+     * @param {number} index - 表格索引
+     * @param {Object} row - 草稿数据对象
+     */
     handleDelete(index, row) {
       let id=row.id;
       this.$request.delete('/draft/delete/'+id).then(
@@ -122,6 +150,11 @@ export default {
           }
       )
     },
+    /**
+     * 获取HTML中的第一张图片
+     * @param {string} htmlContent - HTML内容
+     * @returns {string|null} 图片URL或null
+     */
     getFirstImage(htmlContent) {
       if (htmlContent) {
         let tmp = document.createElement("DIV");
@@ -133,7 +166,11 @@ export default {
       }
       return null;
     },
-    // 新增的计算图片等比例缩放后宽度的计算属性
+    /**
+     * 计算图片等比例缩放后的宽度
+     * @param {string} htmlContent - HTML内容
+     * @returns {Promise<string>|string} 图片宽度或'0px'
+     */
     getImageWidth(htmlContent) {
       const img = this.getFirstImage(htmlContent);
       if (img) {
@@ -151,14 +188,25 @@ export default {
       }
       return '0px';
     },
+    /**
+     * 处理每页条数变化
+     * @param {number} newSize - 新的每页条数
+     */
     handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
+    /**
+     * 处理当前页码变化
+     * @param {number} newPage - 新的页码
+     */
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
       this.fetchData();
     },
+    /**
+     * 加载草稿列表数据
+     */
     fetchData() {
       this.loading = true; // 先将loading设置为true，表示正在加载数据
       let uid = this.user.uid;

@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component ReplyMe
+ * @description 回复我的页面 - 展示其他用户对我的评论回复,支持再次回复
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 回复我的列表容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-table :data="returntable.filter(data =>!search || (data.uname?.toLowerCase()?.includes(search.toLowerCase()))
                                                        || (data.content?.toLowerCase()?.includes(search.toLowerCase())))"
@@ -92,47 +100,76 @@ export default {
   name: "ReplyMe",
   data() {
     return {
+      /** 当前登录用户信息 */
       user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      /** 回复我的评论列表数据 */
       tableData: [],
+      /** 搜索关键字 */
       search: '',
+      /** 加载状态 */
       loading: true,
-      currentPage: 1, // 当前页码
-      total: 0, // 总数据量
+      /** 当前页码 */
+      currentPage: 1,
+      /** 总记录数 */
+      total: 0,
+      /** 文章列表（备用） */
       articles: [],
+      /** 每页显示数量 */
       pageSize: 5,
+      /** 文章标题（备用） */
       title: '',
-      dialogVisible:false,
-      show:false,
-      reply:'',
-      comment:{
-        id:0,
-        title:'',
-        uid:0,
-        aid:0,
-        content:'',
-        send_time:'',
-        audit_uid:0,
-        status:0,
-        parent_id:0,
+      /** 回复对话框显示状态 */
+      dialogVisible: false,
+      /** 错误提示显示状态 */
+      show: false,
+      /** 回复内容 */
+      reply: '',
+      /** 评论提交对象 */
+      comment: {
+        id: 0,             // 评论ID
+        title: '',         // 文章标题
+        uid: 0,            // 用户ID
+        aid: 0,            // 文章ID
+        content: '',       // 评论内容
+        send_time: '',     // 发送时间
+        audit_uid: 0,      // 审核员ID
+        status: 0,         // 审核状态
+        parent_id: 0,      // 父评论ID
       },
-      replyme:{
-        id:1,
-        content:'',
-        aid:0,
+      /** 回复我的评论信息 */
+      replyme: {
+        id: 1,       // 评论ID
+        content: '', // 评论内容
+        aid: 0,      // 文章ID
       }
     };
   },
+  /**
+   * 生命周期钩子 - 组件挂载后加载回复列表
+   */
   mounted() {
     this.fetchData();
   },
   methods: {
+    /**
+     * 处理输入事件
+     * @param {Event} event - 输入事件
+     */
     handleInput(event) {
       console.log(event);
     },
+    /**
+     * 取消回复
+     */
     cancel() {
       this.dialogVisible = false;
       this.reply='';
     },
+    /**
+     * 处理响应
+     * @param {Object} res - 服务器响应
+     * @param {Function} successCallback - 成功回调
+     */
     handleResponse(res, successCallback) {
       if (res.code === '200') {
         successCallback();
@@ -140,6 +177,11 @@ export default {
         this.$message.error(res.data.msg);
       }
     },
+    /**
+     * 提交回复
+     * @param {number} id - 评论ID
+     * @param {number} aid - 文章ID
+     */
     subreply(id,aid){
       console.log(this.reply=='');
       if(this.reply=='')
@@ -165,11 +207,21 @@ export default {
       }
 
     },
+    /**
+     * 移除HTML标签
+     * @param {string} html - HTML内容
+     * @returns {string} 纯文本
+     */
     stripHtmlTags(html) {
       let tmp = document.createElement("DIV");
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText;
     },
+    /**
+     * 编辑记录
+     * @param {number} index - 索引
+     * @param {Object} row - 数据
+     */
     handleEdit(index, row) {
       this.$router.push({
         name: '评论列表',
@@ -182,6 +234,12 @@ export default {
         }
       });
     },
+    /**
+     * 回复评论
+     * 跳转到文章页面并定位到评论
+     * @param {number} index - 索引
+     * @param {Object} row - 数据
+     */
     handleReply(index, row) {
       console.log(index, row);
       this.replyme.id=row.id;
@@ -189,6 +247,11 @@ export default {
       this.replyme.aid=row.aid;
       this.$router.push({name: 'article', params: { id: row.aid },hash:`#comment${row.id}`})
     },
+    /**
+     * 获取第一张图片
+     * @param {string} htmlContent - HTML内容
+     * @returns {string|null} 图片URL
+     */
     getFirstImage(htmlContent) {
       if (htmlContent) {
         let tmp = document.createElement("DIV");
@@ -200,7 +263,11 @@ export default {
       }
       return null;
     },
-    // 新增的计算图片等比例缩放后宽度的计算属性
+    /**
+     * 获取图片宽度
+     * @param {string} htmlContent - HTML内容
+     * @returns {Promise|string} 图片宽度
+     */
     getImageWidth(htmlContent) {
       const img = this.getFirstImage(htmlContent);
       if (img) {
@@ -218,14 +285,25 @@ export default {
       }
       return '0px';
     },
+    /**
+     * 处理每页条数变化
+     * @param {number} newSize - 新的每页条数
+     */
     handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
+    /**
+     * 处理页码变化
+     * @param {number} newPage - 新的页码
+     */
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
       this.fetchData();
     },
+    /**
+     * 加载回复我的列表
+     */
     fetchData() {
       this.loading = true; // 先将loading设置为true，表示正在加载数据
       let id = this.user.uid;
@@ -245,6 +323,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * 返回当前页的回复数据
+     * @returns {Array} 分页后的回复列表
+     */
     returntable() {
       return this.tableData.slice(this.pageSize * (this.currentPage - 1), this.pageSize * this.currentPage);
     }

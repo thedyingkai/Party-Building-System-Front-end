@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component ColumnSet
+ * @description 栏目设置页面 - 支持栏目树形结构管理、文章批量移动、栏目拖拽排序
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 栏目设置容器 -->
   <div class="el-container" style="justify-content: space-around; align-items: center;">
     <div class="column-container">
       <div class="column-container-header">
@@ -175,6 +183,10 @@ export default {
     this.showNodeInfo(this.columnList[this.columnList.length - 1]);
   },
   methods: {
+    /**
+     * 加载栏目数据
+     * 从服务器获取所有栏目并转换数据格式
+     */
     async loadData() {
       try {
         const res = await this.$request.get('/column/selectAll');
@@ -192,6 +204,11 @@ export default {
         console.error('栏目信息获取失败:', error);
       }
     },
+    /**
+     * 显示节点信息
+     * 点击栏目节点时加载该栏目下的文章列表
+     * @param {Object} node - 被点击的栏目节点
+     */
     showNodeInfo(node) {
       if (!node) return;
       if (node.children.length > 0) return;
@@ -209,12 +226,20 @@ export default {
         console.error('发送请求失败:', error);
       });
     },
+    /**
+     * 栏目选择变化处理
+     * @param {Array} selectedOptions - 选中的栏目选项
+     */
     onColumnChange(selectedOptions) {
       if (selectedOptions && selectedOptions.length > 0) {
         const selectedNode = selectedOptions[selectedOptions.length - 1];
         this.showSourceOfColumn(selectedNode);
       }
     },
+    /**
+     * 显示指定栏目的文章
+     * @param {number} nodeId - 栏目ID
+     */
     showSourceOfColumn(nodeId) {
       this.$request.get('/article/selectArticleBycoid/' + nodeId).then(
           res => {
@@ -228,6 +253,11 @@ export default {
         console.error('发送请求失败:', error);
       });
     },
+    /**
+     * 将树形结构转换为数组
+     * @param {Array} array - 原始数组
+     * @returns {Array} 转换后的数组
+     */
     convertToArray(array) {
       let result = [];
       if (Array.isArray(array)) {
@@ -245,6 +275,11 @@ export default {
       }
       return result;
     },
+    /**
+     * 格式化文章列表
+     * @param {Array} array - 文章数据数组
+     * @returns {Array} 格式化后的数据
+     */
     formatSourceList(array) {
       if (!Array.isArray(array)) {
         return [];
@@ -259,6 +294,11 @@ export default {
       });
       return result;
     },
+    /**
+     * 转换栏目选项数据结构
+     * @param {Array} options - 原始栏目数据
+     * @returns {Array} 转换后的数据
+     */
     transformOptions(options) {
       return options.map(item => {
         let newItem = {
@@ -271,6 +311,12 @@ export default {
         return newItem;
       });
     },
+    /**
+     * 过滤树节点
+     * @param {string} value - 过滤关键字
+     * @param {Object} data - 节点数据
+     * @returns {boolean} 是否显示该节点
+     */
     filterNode(value, data) {
       if (!value) return true;
       const valueLower = value.toLowerCase();
@@ -280,6 +326,12 @@ export default {
       const idMatch = id.includes(valueLower);
       return labelMatch || idMatch;
     },
+    /**
+     * 自定义树节点渲染
+     * @param {Function} h - createElement函数
+     * @param {Object} param - 渲染参数
+     * @returns {VNode} 节点虚拟DOM
+     */
     renderContent(h, {data}) {
       const children = [];
       children.push(h('span', {class: 'icon'}, [
@@ -297,6 +349,12 @@ export default {
       ]));
       return h('span', {class: 'custom-tree-node'}, children);
     },
+    /**
+     * 对话框中的树节点渲染
+     * @param {Function} h - createElement函数
+     * @param {Object} param - 渲染参数
+     * @returns {VNode} 节点虚拟DOM
+     */
     renderContentInDialog(h, {data}) {
       const children = [];
       children.push(h('span', {class: 'icon'}, [
@@ -311,11 +369,18 @@ export default {
       children.push(h('span', {}, labelText));
       return h('span', {class: 'custom-tree-node'}, children);
     },
+    /**
+     * 移动文章
+     * @param {Object} data - 文章数据
+     */
     move(data) {
       this.selectedSourceList = [];
       this.dialogVisible_move = true;
       this.selectedSourceList.push(data);
     },
+    /**
+     * 将选中的文章移动到目标栏目
+     */
     moveSourceTo() {
       if (Array.isArray(this.targetColumn)) {
         this.targetColumn = this.targetColumn[this.targetColumn.length - 1];
@@ -329,17 +394,34 @@ export default {
           }));
       this.dialogVisible_move = false;
     },
+    /**
+     * 获取父元素宽度
+     * @returns {number} 父元素宽度
+     */
     getParentWidth() {
       const treeNode = this.$refs.tree.$el;
       return treeNode.offsetWidth;
     },
+    /**
+     * 打开添加文章对话框
+     */
     addSource() {
       this.dialogVisible_add = true;
     },
+    /**
+     * 打开移动文章对话框
+     */
     moveSource() {
       this.selectedSourceList = this.$refs["tree"].getCheckedNodes();
       this.dialogVisible_move = true;
     },
+    /**
+     * 更新栏目数据
+     * 当栏目数据发生变化时更新视图
+     * @param {Array} updatedData - 更新后的数据
+     * @param {number} deletedId - 被删除的节点ID
+     * @param {Object} newNode - 新增的节点
+     */
     updateColumnData(updatedData, deletedId, newNode) {
       this.columnList = updatedData;
       this.formattedColumnList = this.transformOptions(updatedData);
@@ -356,6 +438,9 @@ export default {
         this.showNodeInfo(this.selectedColumn);
       }
     },
+    /**
+     * 将选中的文章移动到当前栏目
+     */
     moveSources() {
       const selectedSourceIdList = this.$refs["tree-in-dialog"].getCheckedKeys();
       this.$request.put('/article/batchMoveToColumn/' + this.selectedColumn.id, selectedSourceIdList).then(
@@ -366,10 +451,18 @@ export default {
           }));
       this.dialogVisible_add = false;
     },
+    /**
+     * 清空选中的文章
+     */
     clearSelectedSource() {
       this.selectedSourceList = [];
       this.dialogVisible_move = false;
     },
+    /**
+     * 选中所有文章
+     * @param {Array} selectedSourceList - 选中的文章列表
+     * @returns {Array} 文章ID数组
+     */
     selectAll(selectedSourceList) {
       let result = [];
       selectedSourceList.forEach(item => {

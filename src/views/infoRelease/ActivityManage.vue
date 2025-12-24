@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component ActivityManage
+ * @description 活动管理页面 - 支持活动的增删改查、活动资源上传下载、参与情况统计
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 活动管理容器 -->
   <div style="flex-grow: 1;display: flex">
     <div v-if="isMenu" ref="tabsContentRef" style="flex-grow: 1">
       <el-tabs v-model="typeIndex" style="height: calc(100vh - 150px)" type="border-card" @tab-click="handleClick">
@@ -301,14 +309,30 @@ export default {
     }
   },
   methods: {
+    /**
+     * 格式化活动内容
+     * 将换行符转换为HTML的<br>标签
+     * @param {string} content - 活动内容文本
+     * @returns {string} 格式化后的HTML内容
+     */
     formatContent(content) {
       return content.replace(/\n/g, '<br>');
     },
+    /**
+     * 获取年月显示名称
+     * 将YYYY-MM格式转换为中文年月表示
+     * @param {string} monthYear - 年月字符串,格式为YYYY-MM
+     * @returns {string} 中文年月表示,如"2023年一月"
+     */
     getMonthYearName(monthYear) {
       const [year, month] = monthYear.split('-');
       const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
       return `${year}年${months[parseInt(month)]}`;
     },
+    /**
+     * 更新活动封面图片
+     * @param {string} url - 新的封面图片URL
+     */
     updateCover(url) {
       let activity = {
         id: this.currentActivity.id,
@@ -325,6 +349,10 @@ export default {
         console.error('数据加载出现错误:', error);
       });
     },
+    /**
+     * 关闭对话框
+     * 关闭所有弹窗并在菜单模式下刷新活动列表
+     */
     handleClose() {
       this.dialogVisible = false;
       this.dialogVisible_editCover = false;
@@ -332,15 +360,27 @@ export default {
       if (this.isMenu)
         this.selectActivitiesOfType(this.activityTypes[this.typeIndex].id);
     },
+    /**
+     * 返回活动列表
+     * 清空当前活动并返回到活动列表视图
+     */
     goBack() {
       this.currentActivity = {};
       this.selectActivitiesOfType(this.activityTypes[this.typeIndex].id);
       this.filterMine = false;
     },
+    /**
+     * 处理标签页点击事件
+     * 切换活动类型标签时重新加载对应类型的活动列表
+     */
     handleClick() {
       this.loading = true;
       this.selectActivitiesOfType(this.activityTypes[this.typeIndex].id);
     },
+    /**
+     * 根据活动类型ID加载活动列表
+     * @param {number} typeId - 活动类型ID
+     */
     selectActivitiesOfType(typeId) {
       this.loading = true;
       this.$request.get('/activity/selectByTypeId', {params: {typeId: typeId, uid: this.user.uid}}).then(
@@ -365,6 +405,11 @@ export default {
         this.loading = false;
       })
     },
+    /**
+     * 访问活动详情
+     * 加载活动详细信息和相关资源
+     * @param {number} activityId - 活动ID
+     */
     visitActivity(activityId) {
       this.$request.get('activity/selectById/' + activityId).then(
           res => {
@@ -402,6 +447,10 @@ export default {
         console.error('资源加载失败', error);
       })
     },
+    /**
+     * 根据文档类型筛选资源
+     * @param {number} documentType - 文档类型(0表示全部)
+     */
     filterType(documentType) {
       if (documentType === 0) {
         this.filterResources = this.resources;
@@ -411,14 +460,23 @@ export default {
         });
       }
     },
+    /**
+     * 打开新增活动对话框
+     */
     addActivity() {
       this.dialogTitle = '新增活动';
       this.dialogVisible_add = true;
     },
+    /**
+     * 打开编辑活动对话框
+     */
     editActivity() {
       this.dialogTitle = '修改活动信息';
       this.dialogVisible_add = true;
     },
+    /**
+     * 打开编辑封面对话框
+     */
     editCover() {
       this.dialogVisible_editCover = true;
     },

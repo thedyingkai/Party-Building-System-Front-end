@@ -1,4 +1,12 @@
+<!--
+/**
+ * @component UserList
+ * @description 用户列表管理页面 - 支持用户批量导入导出、用户信息编辑和搜索
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 用户列表管理容器 -->
   <div style="display: flex; flex-direction: column; flex-grow: 1;padding: 1vh">
     <el-dialog
         :show-cancel-button="true"
@@ -90,35 +98,46 @@ import UserInfo from "@/views/personnelManage/UserEdit.vue";
 import AdaptivePagination from "@/components/AdaptivePagination.vue";
 import {MessageBox} from "element-ui";
 
+/**
+ * 用户列表管理组件
+ */
 export default {
   name: "UserList",
   components: {AdaptivePagination, UserInfo, SearchInput},
   data() {
     return {
-      user: JSON.parse(localStorage.getItem("current-user") || '{}'),
+      user: JSON.parse(localStorage.getItem("current-user") || '{}'), // 当前登录用户
       tableData: [], // 完整的表格数据
       slicedData: [], // 切片后的表格数据
-      total: 0,
-      search: '',
-      rowHeight: 50,
-      loading: true,
-      tableColumns: ['uname', 'cname', 'points'],
-      selectedColumn: '',
-      sequence: 1,
-      chineseColumns: [
+      total: 0, // 用户总数
+      search: '', // 搜索关键字
+      rowHeight: 50, // 表格行高
+      loading: true, // 加载状态
+      tableColumns: ['uname', 'cname', 'points'], // 表格列配置
+      selectedColumn: '', // 选中的搜索列
+      sequence: 1, // 序号起始值
+      chineseColumns: [ // 中文列名映射
         {label: '用户名', value: 'uname'},
         {label: '身份', value: 'cname'},
         {label: '积分', value: 'points'}
       ],
-      selectedUser: '',
-      dialogVisible: false,
-      dialogVisible_import: false,
+      selectedUser: '', // 当前编辑的用户
+      dialogVisible: false, // 编辑对话框显示状态
+      dialogVisible_import: false, // 导入对话框显示状态
     };
   },
+  /**
+   * 组件挂载时获取用户列表数据
+   */
   mounted() {
     this.fetchData();
   },
   computed: {
+    /**
+     * 过滤后的表格数据
+     * 根据搜索关键字和选中列进行过滤
+     * @returns {Array} 过滤后的用户数据列表
+     */
     filterTableData() {
       if (!this.search || !this.selectedColumn) {
         return this.slicedData; // 使用切片后的数据
@@ -131,11 +150,19 @@ export default {
         return false;
       });
     },
+    /**
+     * 批量导入的上传地址
+     * @returns {string} 完整的上传API地址
+     */
     uploadAction() {
       return `${process.env.VUE_APP_BASEURL}/user/import`;
     },
   },
   methods: {
+    /**
+     * 获取用户列表数据
+     * 从服务器加载所有用户信息
+     */
     fetchData() {
       this.loading = true;
       this.$request.get('/user/selectAll').then(
@@ -152,6 +179,11 @@ export default {
         this.loading = false;
       });
     },
+    /**
+     * 删除用户
+     * 弹出确认框后删除选中的用户
+     * @param {Object} user - 要删除的用户对象
+     */
     handleDelete(user) {
       console.log(user);
       MessageBox.confirm('确定删除？', '删除人员', {
@@ -173,27 +205,56 @@ export default {
       });
 
     },
+    /**
+     * 处理分页切片数据
+     * 接收分页组件传递的切片数据
+     * @param {Array} slicedData - 切片后的数据
+     */
     handleSlicedData(slicedData) {
       this.slicedData = slicedData;
     },
+    /**
+     * 更新搜索关键字
+     * @param {string} value - 新的搜索关键字
+     */
     updateSearch(value) {
       this.search = value;
       this.debouncedHandleInput();
     },
+    /**
+     * 更新选中的搜索列
+     * @param {string} value - 列字段名
+     */
     updateSelectedColumn(value) {
       this.selectedColumn = value;
       this.debouncedHandleInput();
     },
+    /**
+     * 防抖处理搜索输入
+     * 300ms延迟执行
+     */
     debouncedHandleInput: _.debounce(function () {
     }, 300),
+    /**
+     * 为表格数据生成序号
+     * 为每条记录添加序号字段
+     */
     generateSequence() {
       this.tableData.forEach((item, index) => {
         item.sequence = this.sequence + index;
       });
     },
+    /**
+     * 导出用户数据
+     * 打开导出Excel文件的URL
+     */
     exportData() {
       window.open(process.env.VUE_APP_BASEURL + '/user/export');
     },
+    /**
+     * 处理批量导入结果
+     * @param {Object} res - 服务器响应结果
+     */
     handleImport(res) {
       this.fetchData();
       if (res.code === '200') {
@@ -202,10 +263,21 @@ export default {
         this.$message.error(res.msg);
       }
     },
+    /**
+     * 编辑用户信息
+     * 打开用户编辑对话框
+     * @param {number} index - 表格行索引
+     * @param {Object} row - 用户数据行
+     */
     handleEdit(index, row) {
       this.selectedUser = row;
       this.dialogVisible = true;
     },
+    /**
+     * 处理用户信息更新
+     * 更新表格中的用户数据
+     * @param {Object} updatedUser - 更新后的用户对象
+     */
     handleUserUpdate(updatedUser) {
       const index = this.tableData.findIndex(item => item.id === updatedUser.id);
       if (index !== -1) {
@@ -213,9 +285,15 @@ export default {
       }
       this.dialogVisible = false;
     },
+    /**
+     * 打开批量导入对话框
+     */
     inputDialog() {
       this.dialogVisible_import = true;
     },
+    /**
+     * 下载Excel导入模板
+     */
     downloadExcel() {
       window.open(process.env.VUE_APP_BASEURL + '/file/download/用户信息表模板.xlsx');
     },

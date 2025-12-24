@@ -1,11 +1,22 @@
+<!--
+/**
+ * @component DefaultView
+ * @description 公共视图默认首页 - 展示轮播图、主题专栏、党建活动等内容
+ * @author Party Building System
+ */
+-->
 <template>
+  <!-- 默认首页容器 -->
   <div>
+    <!-- 第一行：轮播图和文章列表 -->
     <div class="row-a1">
       <div class="wp wpimp" style="margin-top:60px;margin-bottom:60px">
         <div class="oh">
+          <!-- 左侧轮播图 -->
           <div class="col_l">
             <ImgCarousel :carouselItems="carouselData" carouselHeight="380px"/>
           </div>
+          <!-- 右侧主题专栏/党建活动列表 -->
           <ArticleListWithTitle :column-list="columnLists[0]"></ArticleListWithTitle>
         </div>
       </div>
@@ -243,6 +254,9 @@
 import ImgCarousel from "@/components/ImgCarousel";
 import ArticleListWithTitle from "@/components/ArticleListWithTitle";
 
+/**
+ * 公共视图默认首页组件
+ */
 export default {
   name: "DefaultView",
   components: {
@@ -251,22 +265,41 @@ export default {
   },
   data() {
     return {
+      // 轮播图数据列表
       carouselData: [
       ],
+      // 栏目列表配置
+      // 第一组: 主题专栏、党建活动
+      // 第二组: 理论专栏
+      // 第三组: 党建基层巡礼
+      // 第四组: 经典著作、党史讲堂、榜样力量
       columnLists: [
         [{id: 4, name: '主题专栏',}, {id: 5, name: '党建活动',}],
         [{id: 2, name: '理论专栏',}],
         [{id: 17, name: '党建基层巡礼'},],
         [{id: 11, name: '经典著作'}, {id: 14, name: '党史讲堂'}, {id: 16, name: '榜样力量'},]
       ],
+      // 透明表格样式类
       transparentClass: 'transparent-table',
     }
   },
+  /**
+   * 生命周期钩子 - 组件创建时获取首页轮播图数据
+   */
   created() {
-    this.$request.get('/homePic/all').
-    then(res => {
-      this.carouselData=res.data;
-    });
+    this.loadCarouselData();
+  },
+  methods: {
+    /**
+     * 加载首页轮播图数据
+     * @returns {Promise} 返回轮播图数据列表
+     */
+    loadCarouselData() {
+      this.$request.get('/homePic/all').
+      then(res => {
+        this.carouselData=res.data;
+      });
+    },
   },
 }
 </script>
