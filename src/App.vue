@@ -4,13 +4,27 @@
   @component App
   @description Vue 应用的根组件，所有页面通过 router-view 在此处渲染
   @author 党建系统开发团队
+  @update 2026-01-06 添加 Mock 模式切换器
 -->
 <template>
   <div id="app">
     <!-- 路由视图容器，所有页面组件在此渲染 -->
     <router-view/>
+    <!-- Mock 模式切换器（仅开发环境显示） -->
+    <MockSwitch />
   </div>
 </template>
+
+<script>
+import MockSwitch from '@/components/MockSwitch.vue'
+
+export default {
+  name: 'App',
+  components: {
+    MockSwitch
+  }
+}
+</script>
 
 <style lang="scss">
 /* 导入全局样式 */

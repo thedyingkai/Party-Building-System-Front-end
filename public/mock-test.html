@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock 数据测试页面 - 党建系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .status-badge.mock {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .status-badge.real {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .test-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .test-btn {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .test-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item.success {
+            border-left-color: #28a745;
+        }
+
+        .result-item.error {
+            border-left-color: #dc3545;
+        }
+
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .result-content {
+            color: #666;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .guide-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .guide-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 党建系统 - Mock 数据测试中心</h1>
+            <p style="color: #666; margin: 15px 0;">快速验证 Mock 系统是否正常工作</p>
+            <div style="margin-top: 15px;">
+                <span class="status-badge mock" id="statusBadge">
+                    ● Mock 演示模式
+                </span>
+            </div>
+            <a href="./MOCK_GUIDE.md" class="guide-link" target="_blank">
+                📖 查看完整使用指南
+            </a>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 数据统计</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="userCount">2</div>
+                    <div class="stat-label">用户数据</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="articleCount">5</div>
+                    <div class="stat-label">文章数据</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activityCount">3</div>
+                    <div class="stat-label">活动数据</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="examCount">2</div>
+                    <div class="stat-label">考试数据</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 快速测试</h2>
+            <p style="color: #666; margin-bottom: 15px;">点击下方按钮测试各个模块的 Mock 数据</p>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testUsers()">👤 测试用户数据</button>
+                <button class="test-btn" onclick="testArticles()">📰 测试文章列表</button>
+                <button class="test-btn" onclick="testActivities()">🎯 测试活动数据</button>
+                <button class="test-btn" onclick="testExams()">📝 测试考试数据</button>
+                <button class="test-btn" onclick="testComments()">💬 测试评论数据</button>
+                <button class="test-btn" onclick="testStatistics()">📊 测试统计数据</button>
+                <button class="test-btn" onclick="testOrganization()">🏢 测试组织架构</button>
+                <button class="test-btn" onclick="testCarousel()">🎠 测试轮播图</button>
+                <button class="test-btn" onclick="testAll()">🚀 一键测试全部</button>
+            </div>
+            <div id="results" class="result-area"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ 准备就绪检查</h2>
+            <ul style="line-height: 2; color: #333;">
+                <li>✅ Mock 数据文件已创建（mockData.js）</li>
+                <li>✅ Mock 拦截器已配置（mockInterceptor.js）</li>
+                <li>✅ Request.js 已集成 Mock 逻辑</li>
+                <li>✅ 可视化切换组件已添加（MockSwitch.vue）</li>
+                <li>✅ 包含 2 个用户、5 篇文章、3 个活动、2 套试卷</li>
+                <li>✅ 支持所有主要业务模块的数据展示</li>
+            </ul>
+            <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-radius: 8px; color: #155724;">
+                <strong>🎉 系统已就绪！</strong> 您可以开始演示了。记得启动项目后，右下角会有 Mock 模式切换按钮。
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // 导入 Mock 数据用于测试展示
+        import { 
+            mockUsers, 
+            mockArticles, 
+            mockActivities, 
+            mockExams,
+            mockComments,
+            mockStatistics,
+            mockOrganizations,
+            mockCarousels
+        } from './src/utils/mockData.js';
+
+        // 暴露到全局供测试使用
+        window.mockData = {
+            users: mockUsers,
+            articles: mockArticles,
+            activities: mockActivities,
+            exams: mockExams,
+            comments: mockComments,
+            statistics: mockStatistics,
+            organizations: mockOrganizations,
+            carousels: mockCarousels
+        };
+
+        // 显示结果
+        window.showResult = function(title, data, isError = false) {
+            const resultsDiv = document.getElementById('results');
+            const resultItem = document.createElement('div');
+            resultItem.className = `result-item ${isError ? 'error' : 'success'}`;
+            resultItem.innerHTML = `
+                <div class="result-title">${isError ? '❌' : '✅'} ${title}</div>
+                <div class="result-content">${JSON.stringify(data, null, 2)}</div>
+            `;
+            resultsDiv.insertBefore(resultItem, resultsDiv.firstChild);
+        };
+
+        // 测试函数
+        window.testUsers = () => showResult('用户数据', mockUsers);
+        window.testArticles = () => showResult('文章列表', mockArticles.slice(0, 3));
+        window.testActivities = () => showResult('活动数据', mockActivities);
+        window.testExams = () => showResult('考试数据', mockExams);
+        window.testComments = () => showResult('评论数据', mockComments);
+        window.testStatistics = () => showResult('统计数据', mockStatistics);
+        window.testOrganization = () => showResult('组织架构', mockOrganizations);
+        window.testCarousel = () => showResult('轮播图', mockCarousels);
+
+        window.testAll = function() {
+            document.getElementById('results').innerHTML = '';
+            const tests = [
+                testUsers, testArticles, testActivities, testExams,
+                testComments, testStatistics, testOrganization, testCarousel
+            ];
+            tests.forEach((test, index) => {
+                setTimeout(test, index * 300);
+            });
+        };
+
+        console.log('%c🎉 Mock 测试页面已加载', 'color: #667eea; font-size: 16px; font-weight: bold;');
+        console.log('Mock 数据已加载:', window.mockData);
+    </script>
+</body>
+</html>

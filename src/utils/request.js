@@ -4,12 +4,14 @@
  * @description 封装 axios 实例，配置请求/响应拦截器，实现 SM4 加密传输
  * @author 党建系统开发团队
  * @date 2025
+ * @update 2026-01-06 添加 Mock 数据支持
  */
 
 import axios from 'axios'
 import router from "@/router";
 import { decryptData, encryptData } from './sm4';
 import CryptoJS from 'crypto-js';
+import { MOCK_ENABLED, mockRequestHandler } from './mockInterceptor';
 
 /**
  * 创建 axios 实例
@@ -26,6 +28,26 @@ const request = axios.create({
  * 在发送请求前进行处理：添加 token、生成 SM4 加密密钥、加密请求数据
  */
 request.interceptors.request.use(async config => {
+    // ========== Mock 模式拦截 ==========
+    if (MOCK_ENABLED) {
+        console.log('[Mock 模式已启用] 拦截请求:', config.url)
+        try {
+            const mockResponse = await mockRequestHandler(config)
+            if (mockResponse) {
+                // 返回 Mock 数据，阻止真实请求
+                return Promise.reject({
+                    config,
+                    response: { data: mockResponse },
+                    isAxiosError: false,
+                    isMockData: true // 标记为 Mock 数据
+                })
+            }
+        } catch (error) {
+            console.error('[Mock 错误]', error)
+        }
+    }
+    // ========== Mock 模式拦截结束 ==========
+
     // 从本地存储获取用户信息
     let user = JSON.parse(localStorage.getItem("current-user") || '{}')
     // 在请求头中添加 token
@@ -125,6 +147,13 @@ request.interceptors.response.use(
         return response.data;
     },
     error => {
+        // ========== Mock 数据处理 ==========
+        if (error.isMockData) {
+            console.log('[Mock 数据返回]', error.response.data)
+            return Promise.resolve(error.response.data)
+        }
+        // ========== Mock 数据处理结束 ==========
+
         console.error('response error' + error);
         return Promise.reject(error);
     }

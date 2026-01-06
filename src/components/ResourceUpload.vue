@@ -250,6 +250,9 @@ export default {
      */
     selectAll(selectedSourceList) {
       let result = [];
+      // TODO: 实现资源选择逻辑
+      return result;
+    },
     /**
      * 清空选中的资源
      * @description 关闭移动对话框并清空选中资源列表
@@ -261,17 +264,18 @@ export default {
     /**
      * 显示活动列表
      * @description 从服务器获取所有活动数据
-     */})
-      return result;
-    },
-    clearSelectedSource() {
-      this.selectedSourceList = [];
-      this.dialogVisible_move = false;
-    },
+     */
     showActivities() {
       this.$request.get('/activity/selectAll').then(
           res => {
             if (res.code === '200') {
+              this.activities = res.data || [];
+            }
+          }
+      ).catch((error) => {
+        console.error('加载活动列表错误:', error);
+      });
+    },
     /**
      * 返回到活动列表
      * @description 切换回菜单视图并刷新活动列表
@@ -286,13 +290,17 @@ export default {
      * @description 在新窗口中打开文件
      */
     openFile(content) {
-      // 使用 window.open 打开文件地址
       window.open(content);
     },
     /**
      * 关闭上传对话框
      * @description 清空文件并关闭上传对话框
      */
+    handleClose() {
+      this.file = '';
+      this.fileList = [];
+      this.dialogVisible = false;
+    },
     /**
      * 处理文件上传
      * @param {Object} response - 服务器响应
@@ -300,19 +308,6 @@ export default {
      * @param {Array} fileList - 文件列表
      * @description 处理文件上传后的响应，保存文件信息到数据库
      */
-    goBack() {
-      this.isMenu = true;
-      this.showActivities();
-    },
-    openFile(content) {
-      // 使用 window.open 打开文件地址
-      window.open(content);
-    },
-    handleClose() {
-      this.file = '',
-          this.fileList = [];
-      this.dialogVisible = false;
-    },
     handleFileUpload(response, file, fileList) {
       this.urls = fileList.map(v => v.response?.data);
       if (response.code === '200') {
@@ -345,16 +340,14 @@ export default {
             res => {
               if (res.code === '200') {
                 this.$message.success('上传成功');
-                this.handleClose()
-    /**
-     * 移动资源到指定活动
-     * @description 将选中的资源批量移动到目标活动
-     */
+                this.handleClose();
               }
             }
         ).catch((error) => {
           console.error('数据加载出现错误:', error);
         });
+      }
+    },
     /**
      * 提交上传
      * @description 手动触发文件上传
@@ -396,25 +389,9 @@ export default {
     },
     /**
      * 从菜单获取资源
-    /**
-     * 进入活动菜单
-     * @param {number} id - 活动ID
-     * @description 切换到资源列表视图并加载指定活动的资源
-     */
      * @param {number} id - 活动ID
      * @description 根据活动ID获取该活动的所有资源
      */
-    handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 9 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-      if (val.length > 0) {
-        this.existSelected = true;
-      } else {
-        this.existSelected = false;
-      }
-    },
     getResourceFromMenu(id) {
       const data = {uid: this.user.uid, acid: id};
       this.$request.get('resource/selectByUidAndAcid', {params: data}).then(
@@ -431,9 +408,14 @@ export default {
         console.error('数据加载出现错误:', error);
       });
     },
+    /**
+     * 进入活动菜单
+     * @param {number} id - 活动ID
+     * @description 切换到资源列表视图并加载指定活动的资源
+     */
     toMenu(id) {
       this.currentMenuId = id;
-      this.getResourceFromMenu(id)
+      this.getResourceFromMenu(id);
       this.isMenu = false;
     },
   }
